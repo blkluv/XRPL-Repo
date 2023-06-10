@@ -21,3 +21,4 @@ sEdTJe9xiEFKxY17A644fxLCPHBVuiX
 4. [Xumm Developer Console](https://apps.xumm.dev/)
 5. [【NPM】 Numm SDK](https://www.npmjs.com/package/xumm)
 6. [XRP NFT-Explorer](https://test.bithomp.com/nft-explorer)
+7. [【NPM】 xrpl](https://www.npmjs.com/package/xrpl)
