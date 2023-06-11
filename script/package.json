@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "excute": "node src/index.js"
+    "execute": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.1.4",
     "xrpl": "^2.7.0",
     "xumm": "^1.4.0"
   }

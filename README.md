@@ -2,7 +2,9 @@
 
 XRP と連動する NFT Maker アプリです。
 
-### Generated Testnet Faucet Info for. Dev
+### Generated Testnet Faucet Info for Dev
+
+※ 開発用なので本番では絶対に使用しないこと！
 
 - Your Testnet Credentials.
   Address
@@ -13,6 +15,24 @@ XRP と連動する NFT Maker アプリです。
   10,000 XRP
 - Sequence Number.
   38535107
+
+### スクリプトの実行例
+
+```bash
+{
+  uuid: '278379bc-85fc-4610-8057-0816fc335940',
+  next: {
+    always: 'https://xumm.app/sign/278379bc-85fc-4610-8057-0816fc335940'
+  },
+  refs: {
+    qr_png: 'https://xumm.app/sign/278379bc-85fc-4610-8057-0816fc335940_q.png',
+    qr_matrix: 'https://xumm.app/sign/278379bc-85fc-4610-8057-0816fc335940_q.json',
+    qr_uri_quality_opts: [ 'm', 'q', 'h' ],
+    websocket_status: 'wss://xumm.app/sign/278379bc-85fc-4610-8057-0816fc335940'
+  },
+  pushed: false
+}
+```
 
 ### 参考文献
 

@@ -1,10 +1,17 @@
 const { Xumm } = require('xumm');
 const { convertStringToHex, NFTokenMintFlags } = require('xrpl');
+require('dotenv').config();
+
+// 環境変数を読み込む
+const {
+  API_KEY,
+  API_SECRET
+} = process.env;
 
 // インスタンスを生成
 const xumm = new Xumm(
-  'api-key', 
-  'api-secret'
+  API_KEY, 
+  API_SECRET
 );
 
 /**
