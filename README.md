@@ -45,3 +45,4 @@ XRP と連動する NFT Maker アプリです。
 7. [【NPM】 xrpl](https://www.npmjs.com/package/xrpl)
 8. [XLP-24](https://github.com/XRPLF/XRPL-Standards/discussions/69)
 9. [NFT.Storage](https://nft.storage/)
+10. [NFT のミント履歴](https://test.bithomp.com/nft/00080000214300096509110EFDB01B85F3837B10BBC6B13616E5DA9C00000001)

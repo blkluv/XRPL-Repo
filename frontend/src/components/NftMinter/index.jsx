@@ -5,12 +5,19 @@ import { NFTStorage } from "nft.storage";
 import { useEffect, useState } from "react";
 import { XrplClient } from 'xrpl-client';
 import { Xumm } from "xumm";
+import Spinner from "./../Spinner";
 import "./index.css";
 
+// 環境変数を取得
+const {
+  REACT_APP_XRP_API_KEY,
+  REACT_APP_NFT_STORAGE_API_KEY
+} = process.env;
+
 // Xummインスタンスを生成する。
-const xumm = new Xumm('api-key');
+const xumm = new Xumm(REACT_APP_XRP_API_KEY);
 const nftStorage = new NFTStorage({ 
-  token: "api-key",
+  token: REACT_APP_NFT_STORAGE_API_KEY,
 });
 
 /**
@@ -20,6 +27,7 @@ const nftStorage = new NFTStorage({
 export const NftMinter = () => {
   const [account, setAccount] = useState(undefined);
   const [file, setFile] = useState(undefined);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     xumm.on("success", async () => {
@@ -31,7 +39,14 @@ export const NftMinter = () => {
    * connect method
    */
   const connect = () => {
-    xumm.authorize();
+    setIsLoading(true)
+    try {
+      xumm.authorize();
+      setIsLoading(false);
+    } catch(err) {
+      console.error("err:", err);
+      setIsLoading(false);
+    }
   };
 
   /**
@@ -53,6 +68,7 @@ export const NftMinter = () => {
       return;
     }
 
+    setIsLoading(true);
     // 画像とメタデータをIPFSにアップロード
     const { url } = await nftStorage.store({
       schema: "ipfs://QmNpi8rcXEkohca8iXu7zysKKSJYqCvBJn3xJwga8jXqWU",
@@ -82,6 +98,7 @@ export const NftMinter = () => {
 
     if (!signed) {
       alert("トランザクションへの署名は拒否されました！");
+      setIsLoading(false);
       return;
     }
     // テストネットからトランザクションの情報を取得
@@ -92,54 +109,64 @@ export const NftMinter = () => {
     });
     // トランザクション情報からNFTの情報を取得
     const nftoken = extractAffectedNFT(txResponse);
-    alert('NFTトークンが発行されました！')
+    alert('NFTトークンが発行されました！');
+    setIsLoading(false);
+    console.log("nftToken object:", nftoken);
     window.open(`https://test.bithomp.com/nft/${nftoken.NFTokenID}`, "_blank");
   };
 
   return (
     <div className="nft-minter-box">
       <div className="title">XRP NFT</div>
-      <div className="account-box">
-        <div className="account">
-          {account}
+      {isLoading ? 
+        <div className="account-box">
+          <Spinner/>
         </div>
-        <Button 
-          variant="contained" 
-          onClick={connect}
-        >
-          connect
-        </Button>
-      </div>
-      <div className="image-box">
-        <Button 
-          variant="contained"
-          onChange={uploadImage}  
-        >
-          ファイルを選択
-          <input
-            className="imageInput"
-            type="file"
-            accept=".jpg , .jpeg , .png"
-          />
-        </Button>
-        {file && (
-          <img 
-            src={window.URL.createObjectURL(file)} 
-            alt="nft" 
-            className="nft-image" 
-          />
-        )}
-        {account && (
-          <div>
+      : (
+        <>
+          <div className="account-box">
+            <div className="account">
+              My Account: <strong>{account}</strong>
+            </div>
             <Button 
-              variant="outlined" 
-              onClick={mint}
+              variant="contained" 
+              onClick={connect}
             >
-              mint
+              connect
             </Button>
           </div>
-        )}
-      </div>
+          <div className="image-box">
+            <Button 
+              variant="contained"
+              onChange={uploadImage}  
+            >
+              ファイルを選択
+              <input
+                className="imageInput"
+                type="file"
+                accept=".jpg , .jpeg , .png"
+              />
+            </Button>
+            {file && (
+              <img 
+                src={window.URL.createObjectURL(file)} 
+                alt="nft" 
+                className="nft-image" 
+              />
+            )}
+            {account && (
+              <div>
+                <Button 
+                  variant="outlined" 
+                  onClick={mint}
+                >
+                  mint
+                </Button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
