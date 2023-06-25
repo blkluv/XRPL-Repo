@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "frontend": "pnpm -F \"frontend\"",
-    "scripts": "pnpm -F \"scripts\""
+    "script": "pnpm -F \"script\""
   },
   "keywords": [],
   "author": "",
