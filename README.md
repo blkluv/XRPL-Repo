@@ -52,3 +52,4 @@ XRP と連動する NFT Maker アプリです。
 14. [XRPL Scan](https://xrpscan.com/)
 15. [サンプルコード集](https://xrpl.org/ja/code-samples.html)
 16. [XPRL 学習ポータル](https://learn.xrpl.org/)
+17. [XRPL Dapp 開発に有益な開発者ツール集](https://xrpl.org/dev-tools.html)
