@@ -1,14 +1,14 @@
 {
   "name": "XRP-NFT-Maker",
   "version": "1.0.0",
-  "description": "",
+  "description": "XRP LEDGERと連動するDappを開発するためのリポジトリです。",
   "main": "index.js",
   "scripts": {
     "frontend": "pnpm -F \"frontend\"",
     "script": "pnpm -F \"script\""
   },
   "keywords": [],
-  "author": "",
+  "author": "mashharuki",
   "license": "MIT",
   "engines": {
     "node": "18.x",
