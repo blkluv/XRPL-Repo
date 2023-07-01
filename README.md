@@ -34,6 +34,35 @@ XRP と連動する NFT Maker アプリです。
 }
 ```
 
+### アプリの実行方法
+
+#### モジュールのインストール
+
+```bash
+pnpm install
+```
+
+#### XRPL-NFT-Maker
+
+`pkgs/frontend`配下に`.env`ファイルを作成し、下記項目を埋める。
+
+```txt
+REACT_APP_XRP_API_KEY=
+REACT_APP_NFT_STORAGE_API_KEY=
+```
+
+下記コマンドにて起動
+
+```bash
+pnpm frontend run start
+```
+
+#### sample-app-send
+
+```bash
+pnpm sample-app-send run start
+```
+
 ### 参考文献
 
 1. [Xumm](https://xumm.app/)
@@ -53,3 +82,17 @@ XRP と連動する NFT Maker アプリです。
 15. [サンプルコード集](https://xrpl.org/ja/code-samples.html)
 16. [XPRL 学習ポータル](https://learn.xrpl.org/)
 17. [XRPL Dapp 開発に有益な開発者ツール集](https://xrpl.org/dev-tools.html)
+18. [公式サイト(日本語)](https://xrpl.org/ja/index.html)
+19. [ブートキャンプの詳細ページ](https://lu.ma/xrpl_builders_bootcamp)
+20. [GitHub - XRPL](https://github.com/XRPLF)
+21. [Xumm - ドキュメント](https://xumm.readme.io/)
+22. [Youtube](https://youtube.com/channel/UC6zTJdNCBI-TKMt5ubNc_Gg)
+23. [XRPL の特徴](https://xrpl.org/ja/xrp-overview.html)
+24. [UNCHAIN - XRPL-NFT-Maker lession](https://app.unchain.tech/learn/XRPL-NFT-Maker/ja/0/1/)
+25. [Ideathon at "【XRP LEDGER】BUIDLERS BOOTCAMP" - Akindo](https://app.akindo.io/hackathons/Be7ZEGBOWT066OJKl)
+26. [Ripple 公式サイト](https://ripple.com/)
+27. [xrp.cafe](https://xrp.cafe/)
+28. [XRPL - チュートリアル](https://xrpl.org/tutorials.html)
+29. [XRPL Summer Hackathon | Ripple](https://dorahacks.io/hackathon/xrpl-hackathon)
+30. [Begin coding with XRPL and React.js](https://learn.xrpl.org/course/build-with-react-js-and-xrpl/lesson/begin-coding-with-xrpl-and-react-js/)
+

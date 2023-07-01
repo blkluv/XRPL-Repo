@@ -1,10 +1,11 @@
 {
-  "name": "XRP-NFT-Maker",
+  "name": "XRP-Repo",
   "version": "1.0.0",
   "description": "XRP LEDGERと連動するDappを開発するためのリポジトリです。",
   "main": "index.js",
   "scripts": {
     "frontend": "pnpm -F \"frontend\"",
+    "sample-app-send": "pnpm -F \"sample-app-send\"",
     "script": "pnpm -F \"script\""
   },
   "keywords": [],
