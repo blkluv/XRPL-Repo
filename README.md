@@ -1,4 +1,4 @@
-# XRP-NFT-Maker
+# XRPL-Repo
 
 XRP と連動する NFT Maker アプリです。
 
