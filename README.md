@@ -63,6 +63,12 @@ pnpm frontend run start
 pnpm sample-app-send run start
 ```
 
+#### sample-app-recieve
+
+```bash
+pnpm sample-app-recieve run start
+```
+
 ### 参考文献
 
 1. [Xumm](https://xumm.app/)
