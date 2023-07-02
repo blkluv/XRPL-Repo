@@ -69,6 +69,12 @@ pnpm sample-app-send run start
 pnpm sample-app-recieve run start
 ```
 
+#### sample-app-nft
+
+```bash
+pnpm sample-app-nft run start
+```
+
 ### 参考文献
 
 1. [Xumm](https://xumm.app/)

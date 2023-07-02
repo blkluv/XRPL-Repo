@@ -7,7 +7,8 @@
     "frontend": "pnpm -F \"frontend\"",
     "sample-app-send": "pnpm -F \"sample-app-send\"",
     "script": "pnpm -F \"script\"",
-    "sample-app-recieve": "pnpm -F \"sample-app-recieve\""
+    "sample-app-recieve": "pnpm -F \"sample-app-recieve\"",
+    "sample-app-nft": "pnpm -F \"sample-app-nft\""
   },
   "keywords": [],
   "author": "mashharuki",
