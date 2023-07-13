@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "execute": "node index.js"
+    "execute": "node index.js",
+    "offer-create": "node offer-create.js"
   },
   "keywords": [],
   "author": "",

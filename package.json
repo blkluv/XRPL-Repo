@@ -1,5 +1,5 @@
 {
-  "name": "XRP-Repo",
+  "name": "XRPL-Repo",
   "version": "1.0.0",
   "description": "XRP LEDGERと連動するDappを開発するためのリポジトリです。",
   "main": "index.js",

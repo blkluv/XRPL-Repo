@@ -1,6 +1,6 @@
 # XRPL-Repo
 
-XRP と連動する NFT Maker アプリです。
+XRPL と連動するDapp開発のためのリポジトリです。
 
 ### Generated Testnet Faucet Info for Dev
 
@@ -75,6 +75,14 @@ pnpm sample-app-recieve run start
 pnpm sample-app-nft run start
 ```
 
+#### スクリプトを実行する。
+
+- offer createする場合
+
+  ```bash
+  pnpm script offer-create
+  ```
+
 ### 参考文献
 
 1. [Xumm](https://xumm.app/)
@@ -107,4 +115,8 @@ pnpm sample-app-nft run start
 28. [XRPL - チュートリアル](https://xrpl.org/tutorials.html)
 29. [XRPL Summer Hackathon | Ripple](https://dorahacks.io/hackathon/xrpl-hackathon)
 30. [Begin coding with XRPL and React.js](https://learn.xrpl.org/course/build-with-react-js-and-xrpl/lesson/begin-coding-with-xrpl-and-react-js/)
-
+31. [世界初のDEXを使ってみよう！ - Zenn ](https://zenn.dev/tequ/articles/use-original-dex)
+32. [awesome-xrpl - Github](https://github.com/wojake/awesome-xrpl)
+33. [https://xrpl.org/ja/decentralized-exchange.html](https://xrpl.org/ja/decentralized-exchange.html)
+34. [XRPLの学習フロー - Zenn](https://zenn.dev/tequ/articles/xrpl-learning-flow)
+35. [XRP Ledger Faucet](https://faucet.tequ.dev/)
