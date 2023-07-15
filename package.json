@@ -8,7 +8,8 @@
     "sample-app-send": "pnpm -F \"sample-app-send\"",
     "script": "pnpm -F \"script\"",
     "sample-app-recieve": "pnpm -F \"sample-app-recieve\"",
-    "sample-app-nft": "pnpm -F \"sample-app-nft\""
+    "sample-app-nft": "pnpm -F \"sample-app-nft\"",
+    "simple-xrpl-wallet": "pnpm -F \"simple-xrpl-wallet\""
   },
   "keywords": [],
   "author": "mashharuki",
