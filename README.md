@@ -120,3 +120,5 @@ pnpm sample-app-nft run start
 33. [https://xrpl.org/ja/decentralized-exchange.html](https://xrpl.org/ja/decentralized-exchange.html)
 34. [XRPLの学習フロー - Zenn](https://zenn.dev/tequ/articles/xrpl-learning-flow)
 35. [XRP Ledger Faucet](https://faucet.tequ.dev/)
+36. [Build A Browser Wallet Using JS](https://xrpl.org/build-a-browser-wallet-in-js.html)
+37. [using-xrpljs-with-vite-react Config](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-vite-react)
