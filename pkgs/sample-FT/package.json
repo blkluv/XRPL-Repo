@@ -1,0 +1,19 @@
+{
+  "name": "sample-FT",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "issue-a-token": "node scripts/issue-a-token.js",
+    "send-a-token": "node scripts/send-a-token.js",
+    "list-account-tokens": "node scripts/list-account-tokens.js"
+  },
+  "keywords": [],
+  "author": "",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "xrpl": "2.0.0"
+  }
+}

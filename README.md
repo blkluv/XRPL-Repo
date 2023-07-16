@@ -83,6 +83,100 @@ pnpm sample-app-nft run start
   pnpm script offer-create
   ```
 
+#### sample-FT
+
+- トークンの発行スクリプト
+
+  ```bash
+  pnpm run sample-FT issue-a-token
+  ```
+
+  ```bash
+  Requesting addresses from the Testnet faucet...
+  Got hot address rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp and cold address rMyBAqArcoxxjB35iw7YagBspgeQiNcnh7.
+  Sending cold address AccountSet transaction...
+  Transaction succeeded: https://testnet.xrpl.org/transactions/21DE75E6FC53945D51EFA5A0A59709EC44257D5748F2AE2BDFF992962D4FD71B
+  Sending hot address AccountSet transaction...
+  Transaction succeeded: https://testnet.xrpl.org/transactions/F359C63CF9483A4D06ECEB7830AB0B1456591724303C16158D89EE86FD03A1CD
+  Creating trust line from hot address to issuer...
+  Transaction succeeded: https://testnet.xrpl.org/transactions/B46630A8C76EC5B36EA70C6C435086AB2DF36D49CD76FCBBD8D5B251434372BD
+  Sending 384000 MSH to rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp...
+  Transaction succeeded: https://testnet.xrpl.org/transactions/DEE154C08A7BA10804EBCB0A73FFBC5D635989705DA6E9EE09FE02E714EA975A
+  Getting hot address balances...
+  {
+    account: 'rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp',
+    ledger_hash: '68A7E060A088F83F45BE92CF1D3FE9C0EFB8E4970B3BDAE83AF9B8FE272DD874',
+    ledger_index: 39528804,
+    lines: [
+      {
+        account: 'rMyBAqArcoxxjB35iw7YagBspgeQiNcnh7',
+        balance: '384000',
+        currency: 'MSH',
+        limit: '1000000000000000e-2',
+        limit_peer: '0',
+        no_ripple: false,
+        no_ripple_peer: false,
+        quality_in: 0,
+        quality_out: 0
+      }
+    ],
+    validated: true
+  }
+  Getting cold address balances...
+  {
+    "account": "rMyBAqArcoxxjB35iw7YagBspgeQiNcnh7",
+    "balances": {
+      "rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp": [
+        {
+          "currency": "MSH",
+          "value": "384000"
+        }
+      ]
+    },
+    "ledger_hash": "68A7E060A088F83F45BE92CF1D3FE9C0EFB8E4970B3BDAE83AF9B8FE272DD874",
+    "ledger_index": 39528804,
+    "validated": true
+  }
+  ```
+
+- トークンを送金するスクリプト
+
+  ```bash
+  pnpm run sample-FT send-a-token
+  ```
+
+  実行例
+
+  ```bash
+  
+  ```
+
+- トークンの残高を確認するスクリプト
+
+  ```bash
+  pnpm run sample-FT list-account-tokens
+  ```
+
+  実行結果
+
+  ```bash
+  Connecting to Testnet...
+
+  Account rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp's Ledger Objects:
+
+  1. Index (ObjectID/keylet): F2A674B8EF8E007A7699FC88852B589F3F7A9CA83976309D5018057484EF6C43
+    - LedgerEntryType: RippleState 
+
+  Account rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp's Trust lines:
+
+  1. Trustline:
+    - Account: rMyBAqArcoxxjB35iw7YagBspgeQiNcnh7
+    - Currency: MSH
+    - Amount: 384000
+    - Limit: 1000000000000000e-2
+    - Limit Peer: 0
+  ```
+
 ### 参考文献
 
 1. [Xumm](https://xumm.app/)
@@ -122,3 +216,6 @@ pnpm sample-app-nft run start
 35. [XRP Ledger Faucet](https://faucet.tequ.dev/)
 36. [Build A Browser Wallet Using JS](https://xrpl.org/build-a-browser-wallet-in-js.html)
 37. [using-xrpljs-with-vite-react Config](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-vite-react)
+38. [xrpl.jsの詳細ページ](https://js.xrpl.org/)
+39. [Issue a Fungible Token SampleCode - GitHub](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/issue-a-token/)
+40. [Trade in the Decentralized Exchange SampleCode - GitHub](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/trade-in-the-decentralized-exchange/)
