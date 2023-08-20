@@ -1,0 +1,17 @@
+{
+  "name": "sample-dex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dex": "node src/trade-in-the-dex.js"
+  },
+  "dependencies": {
+    "xrpl": "^2.1.0",
+    "bignumber.js": "^9.0.0"
+  },
+  "keywords": [],
+  "author": "mashharuki",
+  "private": true,
+  "license": "MIT"
+}

@@ -211,7 +211,7 @@ pnpm sample-app-nft run start
 30. [Begin coding with XRPL and React.js](https://learn.xrpl.org/course/build-with-react-js-and-xrpl/lesson/begin-coding-with-xrpl-and-react-js/)
 31. [世界初のDEXを使ってみよう！ - Zenn ](https://zenn.dev/tequ/articles/use-original-dex)
 32. [awesome-xrpl - Github](https://github.com/wojake/awesome-xrpl)
-33. [https://xrpl.org/ja/decentralized-exchange.html](https://xrpl.org/ja/decentralized-exchange.html)
+33. [Trade in the Decentralized Exchange tutorial](https://xrpl.org/ja/decentralized-exchange.html)
 34. [XRPLの学習フロー - Zenn](https://zenn.dev/tequ/articles/xrpl-learning-flow)
 35. [XRP Ledger Faucet](https://faucet.tequ.dev/)
 36. [Build A Browser Wallet Using JS](https://xrpl.org/build-a-browser-wallet-in-js.html)

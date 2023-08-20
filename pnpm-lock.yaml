@@ -181,6 +181,15 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
 
+  pkgs/sample-dex:
+    dependencies:
+      bignumber.js:
+        specifier: ^9.0.0
+        version: 9.1.1
+      xrpl:
+        specifier: ^2.1.0
+        version: 2.7.0
+
   pkgs/script:
     dependencies:
       dotenv:

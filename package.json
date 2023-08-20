@@ -10,7 +10,8 @@
     "sample-app-recieve": "pnpm -F \"sample-app-recieve\"",
     "sample-app-nft": "pnpm -F \"sample-app-nft\"",
     "simple-xrpl-wallet": "pnpm -F \"simple-xrpl-wallet\"",
-    "sample-FT": "pnpm -F \"sample-FT\""
+    "sample-FT": "pnpm -F \"sample-FT\"",
+    "sample-dex": "pnpm -F \"sample-dex\""
   },
   "keywords": [],
   "author": "mashharuki",
