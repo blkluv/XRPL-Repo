@@ -219,3 +219,5 @@ pnpm sample-app-nft run start
 38. [xrpl.jsの詳細ページ](https://js.xrpl.org/)
 39. [Issue a Fungible Token SampleCode - GitHub](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/issue-a-token/)
 40. [Trade in the Decentralized Exchange SampleCode - GitHub](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/trade-in-the-decentralized-exchange/)
+41. [awesome-xrpl](https://github.com/wojake/awesome-xrpl)
+42. [CodeSandBox @nice-xrpl/react-xrpl](https://codesandbox.io/examples/package/@nice-xrpl/react-xrpl)

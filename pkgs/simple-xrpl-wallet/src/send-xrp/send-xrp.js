@@ -125,9 +125,10 @@ submitTxBtn.addEventListener('click', async () => {
     submitTxBtn.textContent = 'Submitting...';
 
     // Create the transaction object: https://xrpl.org/transaction-common-fields.html
+    // Convert XRP to drops: https://xrpl.org/basic-data-types.html#specifying-currency-amounts
     const txJson = {
       TransactionType: 'Payment',
-      Amount: xrpToDrops(amount.value), // Convert XRP to drops: https://xrpl.org/basic-data-types.html#specifying-currency-amounts
+      Amount: xrpToDrops(amount.value), 
       Destination: destinationAddress.value,
     };
 
@@ -135,6 +136,8 @@ submitTxBtn.addEventListener('click', async () => {
     if (destinationTag?.value !== '') {
       txJson.DestinationTag = destinationTag.value;
     }
+
+    console.log('txJson:', txJson);
 
     // Submit the transaction to the ledger
     const { result } = await submitTransaction({ client, tx: txJson });

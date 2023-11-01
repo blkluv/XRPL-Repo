@@ -31,7 +31,9 @@ export function CreateSourceWallet({ children }) {
   };
 
   return seed ? (
-    <Wallet seed={seed}>{children}</Wallet>
+    <Wallet seed={seed}>
+      {children}
+    </Wallet>
   ) : (
     <div>
       {!sending ? (

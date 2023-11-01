@@ -20,6 +20,9 @@ export function SendXRP() {
   const [amount, setAmount] = useState(48);
   const [sending, setSending] = useState(false);
 
+  // base URL 
+  const baseURL = "https://amm-devnet.xrpl.org/transactions";
+
   /**
    * send XRP function
    */
@@ -30,7 +33,7 @@ export function SendXRP() {
       // send xrpl
       const result = await sendXRP(destinationAddress, amount);
       console.log("UI: ", result);
-      console.log("explorer URL:", `https://testnet.xrpl.org/transactions/${result.result.hash}/simple`)
+      console.log("explorer URL:", `${baseURL}/${result.result.hash}/simple`)
     } catch (e) {
       alert(e);
     }

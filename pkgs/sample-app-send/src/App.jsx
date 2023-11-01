@@ -40,7 +40,7 @@ function MainApp() {
 export default function App() {
   return (
     <div className="App">
-      <XRPLClient network={Networks.Testnet}>
+      <XRPLClient network={Networks.AMMTestnet}>
         <MainApp />
       </XRPLClient>
     </div>
