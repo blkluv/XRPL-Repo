@@ -29,6 +29,10 @@ export const NftMinter = () => {
   const [file, setFile] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
+  // ENDPOINTURL 
+  const END_POINT_URL = "wss://amm.devnet.rippletest.net:51233/";
+  // const END_POINT_URL =  "wss://testnet.xrpl-labs.com"
+
   useEffect(() => {
     xumm.on("success", async () => {
       setAccount(await xumm.user.account);
@@ -102,7 +106,7 @@ export const NftMinter = () => {
       return;
     }
     // テストネットからトランザクションの情報を取得
-    const client = new XrplClient("wss://testnet.xrpl-labs.com");
+    const client = new XrplClient(END_POINT_URL);
     const txResponse = await client.send({
       command: "tx",
       transaction: txid,
