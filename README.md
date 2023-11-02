@@ -222,3 +222,6 @@ pnpm sample-app-nft run start
 41. [awesome-xrpl](https://github.com/wojake/awesome-xrpl)
 42. [CodeSandBox @nice-xrpl/react-xrpl](https://codesandbox.io/examples/package/@nice-xrpl/react-xrpl)
 43. [【GitHub】XummSDK-React-Demo](https://github.com/XRPL-Labs/XummSDK-React-Demo/tree/main)
+44. [【GitHub】xrpl-dex-dex](https://github.com/tequdev/xrpl-dex-sdk)
+45. [【GitHub】create AMM](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/create-amm/)
+46. [Create an Automated Market Maker](https://xrpl.org/create-an-automated-market-maker.html#1-connect-to-the-network)
