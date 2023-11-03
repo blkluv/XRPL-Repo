@@ -1,6 +1,6 @@
 # XRPL-Repo
 
-XRPL と連動するDapp開発のためのリポジトリです。
+XRPL と連動する Dapp 開発のためのリポジトリです。
 
 ### Generated Testnet Faucet Info for Dev
 
@@ -77,7 +77,7 @@ pnpm sample-app-nft run start
 
 #### スクリプトを実行する。
 
-- offer createする場合
+- offer create する場合
 
   ```bash
   pnpm script offer-create
@@ -148,7 +148,7 @@ pnpm sample-app-nft run start
   実行例
 
   ```bash
-  
+
   ```
 
 - トークンの残高を確認するスクリプト
@@ -165,7 +165,7 @@ pnpm sample-app-nft run start
   Account rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp's Ledger Objects:
 
   1. Index (ObjectID/keylet): F2A674B8EF8E007A7699FC88852B589F3F7A9CA83976309D5018057484EF6C43
-    - LedgerEntryType: RippleState 
+    - LedgerEntryType: RippleState
 
   Account rn3iPRS6AsADpALjTe9H6kcx6LHryxdzEp's Trust lines:
 
@@ -209,14 +209,14 @@ pnpm sample-app-nft run start
 28. [XRPL - チュートリアル](https://xrpl.org/tutorials.html)
 29. [XRPL Summer Hackathon | Ripple](https://dorahacks.io/hackathon/xrpl-hackathon)
 30. [Begin coding with XRPL and React.js](https://learn.xrpl.org/course/build-with-react-js-and-xrpl/lesson/begin-coding-with-xrpl-and-react-js/)
-31. [世界初のDEXを使ってみよう！ - Zenn ](https://zenn.dev/tequ/articles/use-original-dex)
+31. [世界初の DEX を使ってみよう！ - Zenn ](https://zenn.dev/tequ/articles/use-original-dex)
 32. [awesome-xrpl - Github](https://github.com/wojake/awesome-xrpl)
 33. [Trade in the Decentralized Exchange tutorial](https://xrpl.org/ja/decentralized-exchange.html)
-34. [XRPLの学習フロー - Zenn](https://zenn.dev/tequ/articles/xrpl-learning-flow)
+34. [XRPL の学習フロー - Zenn](https://zenn.dev/tequ/articles/xrpl-learning-flow)
 35. [XRP Ledger Faucet](https://faucet.tequ.dev/)
 36. [Build A Browser Wallet Using JS](https://xrpl.org/build-a-browser-wallet-in-js.html)
 37. [using-xrpljs-with-vite-react Config](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-vite-react)
-38. [xrpl.jsの詳細ページ](https://js.xrpl.org/)
+38. [xrpl.js の詳細ページ](https://js.xrpl.org/)
 39. [Issue a Fungible Token SampleCode - GitHub](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/issue-a-token/)
 40. [Trade in the Decentralized Exchange SampleCode - GitHub](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/trade-in-the-decentralized-exchange/)
 41. [awesome-xrpl](https://github.com/wojake/awesome-xrpl)
@@ -226,3 +226,9 @@ pnpm sample-app-nft run start
 45. [【GitHub】create AMM](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/create-amm/)
 46. [Create an Automated Market Maker](https://xrpl.org/create-an-automated-market-maker.html#1-connect-to-the-network)
 47. [トランザクションタイプ](https://xrpl.org/ja/transaction-types.html)
+48. [XRPL ドキュメント - AMMBid](https://xrpl.org/ammbid.html)
+49. [XRPL ドキュメント - AMMCreate](https://xrpl.org/ammcreate.html)
+50. [XRPL ドキュメント - AMMDelete](https://xrpl.org/ammdelete.html)
+51. [XRPL ドキュメント - AMMDeposit](https://xrpl.org/ammdeposit.html)
+52. [XRPL ドキュメント - AMMVote](https://xrpl.org/ammvote.html)
+53. [XRPL ドキュメント - AMMWithdraw](https://xrpl.org/ammwithdraw.html)
