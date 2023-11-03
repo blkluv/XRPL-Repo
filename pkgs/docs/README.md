@@ -85,3 +85,5 @@ XRPL がネイティブでサポートしている(もしくはしようとし�
 10. [xrp.cafe](https://xrp.cafe/)
 11. [XRPL - チュートリアル](https://xrpl.org/tutorials.html)
 12. [XRPL Summer Hackathon | Ripple](https://dorahacks.io/hackathon/xrpl-hackathon)
+13. [DCCEX - プロジェクトページ](https://app.akindo.io/communities/q3O8qpDjpTjvxMx89/products/0nL4N8rVoFzjwQGXg)
+14. [暗号資産（仮想通貨）の価格はなぜ上がる？仕組みを理解し急騰に備えよう！](https://coincheck.com/ja/article/271)
