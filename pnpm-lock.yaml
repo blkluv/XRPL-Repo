@@ -10,6 +10,9 @@ importers:
 
   pkgs/create-amm:
     dependencies:
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
       xrpl:
         specifier: 2.11.0
         version: 2.11.0

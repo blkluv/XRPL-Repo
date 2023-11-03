@@ -8,6 +8,7 @@
 if (typeof module !== "undefined") {
   // Use var here because const/let are block-scoped to the if statement.
   var xrpl = require('xrpl')
+  require('dotenv').config();
   // Configure console.log to print deeper into nested objects so you can
   // better see properties of the AMM:
   require('util').inspect.defaultOptions.depth = 5
@@ -17,58 +18,74 @@ if (typeof module !== "undefined") {
 const WS_URL = 'wss://s.devnet.rippletest.net:51233'
 const EXPLORER = 'https://devnet.xrpl.org'
 
+/**
+ * AMM機能を試すためのスクリプト
+ */
 async function main() {
   const client = new xrpl.Client(WS_URL);
   await client.connect()
 
   // Get credentials from the Faucet -------------------------------------------
   console.log("Requesting address from the faucet...")
-  const wallet = (await client.fundWallet()).wallet
+  // const wallet = (await client.fundWallet()).wallet
 
   // To use an existing account, use code such as the following:
-  // const wallet = xrpl.Wallet.fromSeed(process.env['USE_SEED'])
+  const wallet = xrpl.Wallet.fromSeed(process.env.SECRET_FEED)
 
+  // Create New Token
+  const msh_amount = await get_new_token(client, wallet, "MSH", "10000")
   // Acquire tokens ------------------------------------------------------------
-  const offer_result = await client.submitAndWait({
-    "TransactionType": "OfferCreate",
-    "Account": wallet.address,
-    "TakerPays": {
-      currency: "TST",
-      issuer: "rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd",
-      value: "25"
-    },
-    "TakerGets": xrpl.xrpToDrops(25*10*1.16)
-  }, {autofill: true, wallet: wallet})
-  if (offer_result.result.meta.TransactionResult == "tesSUCCESS") {
-    console.log(`TST offer placed: ${EXPLORER}/transactions/${offer_result.result.hash}`)
-    const balance_changes = xrpl.getBalanceChanges(offer_result.result.meta)
-    for (const bc of balance_changes) {
-      if (bc.account != wallet.address) {continue}
-      for (const bal of bc.balances) {
-        if (bal.currency == "TST") {
-          console.log(`Got ${bal.value} ${bal.currency}.${bal.issuer}.`)
-          break
+  try {
+    const offer_result = await client.submitAndWait({
+      "TransactionType": "OfferCreate",
+      "Account": wallet.address,
+      "TakerPays": {
+        currency: msh_amount.currency,
+        issuer: msh_amount.issuer,
+        value: "1000"
+      },
+      "TakerGets": xrpl.xrpToDrops(25*10*1.16)
+    }, {
+      autofill: true, 
+      wallet: wallet
+    })
+  
+    if (offer_result.result.meta.TransactionResult == "tesSUCCESS") {
+      console.log(`MSH offer placed: ${EXPLORER}/transactions/${offer_result.result.hash}`)
+      const balance_changes = xrpl.getBalanceChanges(offer_result.result.meta)
+  
+      for (const bc of balance_changes) {
+        if (bc.account != wallet.address) {continue}
+        for (const bal of bc.balances) {
+          if (bal.currency == "MSH") {
+            console.log(`Got ${bal.value} ${bal.currency}.${bal.issuer}.`)
+            break
+          }
         }
+        break
       }
-      break
+  
+    } else {
+      throw `Error sending transaction: ${offer_result}`
     }
-
-  } else {
-    throw `Error sending transaction: ${offer_result}`
+  } catch(err) {
+    console.error("Acquire tokens err: ", err)
   }
+
   // Successfully placing the offer doesn't necessarily mean that you have TST,
   // but for now, let's assume it matched existing Offers on ledger so you do.
 
   // Call helper function to set up a new "FOO" issuer, create a trust line
   // to them, and receive 1000 FOO from them.
+  // call get new token method (FOO トークンを発行)
   const foo_amount = await get_new_token(client, wallet, "FOO", "1000")
 
   // Check if AMM already exists ----------------------------------------------
   const amm_info_request = {
     "command": "amm_info",
     "asset": {
-      "currency": "TST",
-      "issuer": "rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd",
+      "currency": msh_amount.currency,
+      "issuer": msh_amount.issuer,
     },
     "asset2": {
       "currency": foo_amount.currency,
@@ -76,6 +93,7 @@ async function main() {
     },
     "ledger_index": "validated"
   }
+
   try {
     const amm_info_result = await client.request(amm_info_request)
     console.log(amm_info_result)
@@ -83,7 +101,7 @@ async function main() {
     if (err.data.error === 'actNotFound') {
       console.log(`No AMM exists yet for the pair
                    ${foo_amount.currency}.${foo_amount.issuer} /
-                   TST.rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd.
+                   ${msh_amount.currency}.${msh_amount.issuer}
                    (This is probably as expected.)`)
     } else {
       throw(err)
@@ -95,60 +113,77 @@ async function main() {
   // (in drops) on the current network using server_state:
   const ss = await client.request({"command": "server_state"})
   const amm_fee_drops = ss.result.state.validated_ledger.reserve_inc.toString()
-  console.log(`Current AMMCreate transaction cost:
-               ${xrpl.dropsToXrp(amm_fee_drops)} XRP`)
+  console.log(`Current AMMCreate transaction cost: ${xrpl.dropsToXrp(amm_fee_drops)} XRP`)
 
 
   // Create AMM ---------------------------------------------------------------
   // This example assumes that 15 TST ≈ 100 FOO in value.
-  const ammcreate_result = await client.submitAndWait({
-    "TransactionType": "AMMCreate",
-    "Account": wallet.address,
-    "Amount": {
-      currency: "TST",
-      issuer: "rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd",
-      value: "15"
-    },
-    "Amount2": {
-      "currency": foo_amount.currency,
-      "issuer": foo_amount.issuer,
-      "value": "100"
-    },
-    "TradingFee": 500, // 0.5%
-    "Fee": amm_fee_drops
-  }, {autofill: true, wallet: wallet, fail_hard: true})
-  // Use fail_hard so you don't waste the tx cost if you mess up
-  if (ammcreate_result.result.meta.TransactionResult == "tesSUCCESS") {
-    console.log(`AMM created: ${EXPLORER}/transactions/${ammcreate_result.result.hash}`)
-  } else {
-    throw `Error sending transaction: ${ammcreate_result}`
+  try {
+    const ammcreate_result = await client.submitAndWait({
+      "TransactionType": "AMMCreate",
+      "Account": wallet.address,
+      "Amount": {
+        currency: msh_amount.currency,
+        issuer: msh_amount.issuer,
+        value: "15"
+      },
+      "Amount2": {
+        "currency": foo_amount.currency,
+        "issuer": foo_amount.issuer,
+        "value": "100"
+      },
+      "TradingFee": 500, // 0.5%
+      "Fee": amm_fee_drops
+    }, {
+      autofill: true, 
+      wallet: wallet, 
+      fail_hard: true
+    })
+  
+    // Use fail_hard so you don't waste the tx cost if you mess up
+    if (ammcreate_result.result.meta.TransactionResult == "tesSUCCESS") {
+      console.log(`AMM created: ${EXPLORER}/transactions/${ammcreate_result.result.hash}`)
+    } else {
+      throw `Error sending transaction: ${JSON.stringify(ammcreate_result)}`
+    }
+  } catch(err) {
+    console.error("create amm err:", err)
   }
+  
 
   // Confirm that AMM exists --------------------------------------------------
   // Make the same amm_info request as earlier, but this time it should succeed
   const amm_info_result2 = await client.request(amm_info_request)
-  console.log(amm_info_result2)
+  console.log("amm_info_result2:", amm_info_result2)
+
   const lp_token = amm_info_result2.result.amm.lp_token
   const amount = amm_info_result2.result.amm.amount
   const amount2 = amm_info_result2.result.amm.amount2
+
   console.log(`The AMM account ${lp_token.issuer} has ${lp_token.value} total
                LP tokens outstanding, and uses the currency code ${lp_token.currency}.`)
   console.log(`In its pool, the AMM holds ${amount.value} ${amount.currency}.${amount.issuer}
                and ${amount2.value} ${amount2.currency}.${amount2.issuer}`)
 
   // Check token balances
-  const account_lines_result = await client.request({
-    "command": "account_lines",
-    "account": wallet.address,
-    // Tip: To look up only the new AMM's LP Tokens, uncomment:
-    // "peer": lp_token.issuer,
-    "ledger_index": "validated"
-  })
-  console.log(account_lines_result)
+  try {
+    const account_lines_result = await client.request({
+      "command": "account_lines",
+      "account": wallet.address,
+      // Tip: To look up only the new AMM's LP Tokens, uncomment:
+      // "peer": lp_token.issuer,
+      "ledger_index": "validated"
+    })
+    console.log("account_lines_result:", account_lines_result)
+  } catch(err) {
+    console.error("Check token balances err:", err)
+  }
+  
 
   // Disconnect when done -----------------------------------------------------
   await client.disconnect()
 }
+
 main()
 
 
@@ -172,7 +207,12 @@ main()
  *   "value": "123.456"
  * }
  */
-async function get_new_token(client, wallet, currency_code, issue_quantity) {
+async function get_new_token(
+  client, 
+  wallet, 
+  currency_code, 
+  issue_quantity
+) {
   // Get credentials from the Testnet Faucet -----------------------------------
   console.log("Funding an issuer address with the faucet...")
   const issuer = (await client.fundWallet()).wallet
@@ -183,7 +223,11 @@ async function get_new_token(client, wallet, currency_code, issue_quantity) {
     "TransactionType": "AccountSet",
     "Account": issuer.address,
     "SetFlag": xrpl.AccountSetAsfFlags.asfDefaultRipple
-  }, {autofill: true, wallet: issuer} )
+  }, {
+    autofill: true, 
+    wallet: issuer
+  } )
+
   if (issuer_setup_result.result.meta.TransactionResult == "tesSUCCESS") {
     console.log(`Issuer DefaultRipple enabled: ${EXPLORER}/transactions/${issuer_setup_result.result.hash}`)
   } else {
@@ -216,7 +260,11 @@ async function get_new_token(client, wallet, currency_code, issue_quantity) {
       "issuer": issuer.address
     },
     "Destination": wallet.address
-  }, {autofill: true, wallet: issuer})
+  }, {
+    autofill: true, 
+    wallet: issuer
+  })
+
   if (issue_result.result.meta.TransactionResult == "tesSUCCESS") {
     console.log(`Tokens issued: ${EXPLORER}/transactions/${issue_result.result.hash}`)
   } else {

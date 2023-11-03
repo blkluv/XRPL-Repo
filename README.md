@@ -225,3 +225,4 @@ pnpm sample-app-nft run start
 44. [【GitHub】xrpl-dex-dex](https://github.com/tequdev/xrpl-dex-sdk)
 45. [【GitHub】create AMM](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples/create-amm/)
 46. [Create an Automated Market Maker](https://xrpl.org/create-an-automated-market-maker.html#1-connect-to-the-network)
+47. [トランザクションタイプ](https://xrpl.org/ja/transaction-types.html)
