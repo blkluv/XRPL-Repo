@@ -73,50 +73,57 @@ export const NftMinter = () => {
     }
 
     setIsLoading(true);
-    // 画像とメタデータをIPFSにアップロード
-    const { url } = await nftStorage.store({
-      schema: "ipfs://QmNpi8rcXEkohca8iXu7zysKKSJYqCvBJn3xJwga8jXqWU",
-      nftType: "art.v0",
-      image: file,
-      name: "some name",
-      description: "some description",
-    });
-    // Xummにトランザクションデータを送信
-    const payload = await xumm.payload.createAndSubscribe({
-      TransactionType: "NFTokenMint",
-      NFTokenTaxon: 0,
-      Flags: 8,
-      URI: Buffer.from(url).toString("hex"),
-    });
+    try {
+      // 画像とメタデータをIPFSにアップロード
+      const { url } = await nftStorage.store({
+        schema: "ipfs://QmNpi8rcXEkohca8iXu7zysKKSJYqCvBJn3xJwga8jXqWU",
+        nftType: "art.v0",
+        image: file,
+        name: "some name",
+        description: "some description",
+      });
+      // Xummにトランザクションデータを送信
+      const payload = await xumm.payload.createAndSubscribe({
+        TransactionType: "NFTokenMint",
+        NFTokenTaxon: 0,
+        Flags: 8,
+        URI: Buffer.from(url).toString("hex"),
+      });
 
-    payload.websocket.onmessage = (msg) => {
-      const data = JSON.parse(msg.data.toString());
-      // トランザクションへの署名が完了/拒否されたらresolve
-      if (typeof data.signed === "boolean") {
-        payload.resolve({ signed: data.signed, txid: data.txid });
+      payload.websocket.onmessage = (msg) => {
+        const data = JSON.parse(msg.data.toString());
+        // トランザクションへの署名が完了/拒否されたらresolve
+        if (typeof data.signed === "boolean") {
+          payload.resolve({ signed: data.signed, txid: data.txid });
+        }
+      };
+
+      // resolveされるまで待機
+      const { signed, txid } = await payload.resolved;
+
+      if (!signed) {
+        alert("トランザクションへの署名は拒否されました！");
+        setIsLoading(false);
+        return;
       }
-    };
+      // テストネットからトランザクションの情報を取得
+      const client = new XrplClient(END_POINT_URL);
+      const txResponse = await client.send({
+        command: "tx",
+        transaction: txid,
+      });
 
-    // resolveされるまで待機
-    const { signed, txid } = await payload.resolved;
-
-    if (!signed) {
-      alert("トランザクションへの署名は拒否されました！");
+      // トランザクション情報からNFTの情報を取得
+      const nftoken = extractAffectedNFT(txResponse);
+      alert('NFTトークンが発行されました！');
       setIsLoading(false);
-      return;
+      console.log("nftToken object:", nftoken);
+      window.open(`https://test.bithomp.com/nft/${nftoken.NFTokenID}`, "_blank");
+    } catch(err) {
+      console.error("err :", err)
+    } finally {
+      setIsLoading(false);
     }
-    // テストネットからトランザクションの情報を取得
-    const client = new XrplClient(END_POINT_URL);
-    const txResponse = await client.send({
-      command: "tx",
-      transaction: txid,
-    });
-    // トランザクション情報からNFTの情報を取得
-    const nftoken = extractAffectedNFT(txResponse);
-    alert('NFTトークンが発行されました！');
-    setIsLoading(false);
-    console.log("nftToken object:", nftoken);
-    window.open(`https://test.bithomp.com/nft/${nftoken.NFTokenID}`, "_blank");
   };
 
   return (
