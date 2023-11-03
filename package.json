@@ -4,6 +4,7 @@
   "description": "XRP LEDGERと連動するDappを開発するためのリポジトリです。",
   "main": "index.js",
   "scripts": {
+    "create-amm": "pnpm -F \"create-amm\"",
     "frontend": "pnpm -F \"frontend\"",
     "sample-app-send": "pnpm -F \"sample-app-send\"",
     "script": "pnpm -F \"script\"",
