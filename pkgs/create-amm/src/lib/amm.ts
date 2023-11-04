@@ -178,6 +178,8 @@ export const confirmAmm = async(
     const amount = results.amm.amount
     const amount2 = results.amm.amount2
 
+    const ammAddress = lp_token.issuer;
+
     console.log(`The AMM account ${lp_token.issuer} has ${lp_token.value} total
                 LP tokens outstanding, and uses the currency code ${lp_token.currency}.`)
     console.log(`In its pool, the AMM holds ${amount.value} ${amount.currency}.${amount.issuer}
@@ -191,12 +193,77 @@ export const confirmAmm = async(
       // "peer": lp_token.issuer,
       "ledger_index": "validated"
     })
-    return account_lines_result;
+    return {
+      account_lines_result,
+      ammAddress
+    };
   } catch(err) {
     console.error("Check token balances err:", err)
     return null;
   }
 }
+
+/**
+ * AMMを介してトークンをSwapするメソッド
+ * @param client 
+ * @param wallet 
+ * @param ammAddress
+ * @param token1Info
+ * @param token2Info
+ * @returns 
+ */
+export const swap = async(
+  client: any,
+  wallet: any,
+  ammAddress: string,
+  token1Info: TokenInfo,
+  value: string
+) => {
+  // Swap用のトランザクションデータを作成する
+  const swapTxData = {
+    "TransactionType": "Payment",
+    "Account": wallet.address,
+    "Destination": ammAddress,          // AMMアカウントのアドレスを指定
+    "Amount": {
+      "currency": token1Info.currency,  // ここで送金したいトークンの種類を指定する。
+      "value": value,                   // ここで送金したいトークンの金額を指定する。
+      "issuer": token1Info.issuer
+    },
+    "SendMax": {
+      "currency": token1Info.currency,  // ここで送金したいトークンの種類を指定する。
+      "value": value,                   // ここで送金したいトークンの金額を指定する。
+      "issuer": token1Info.issuer
+    },
+    "DestinationTag": 1 
+  }
+
+  try {
+    const pay_prepared = await client.autofill(swapTxData);
+    // トランザクションに署名
+    const pay_signed = wallet.sign(pay_prepared);
+    console.log(`Sending ${value} ${token1Info.currency} to ${ammAddress}...`)
+    // 署名済みトランザクションをブロードキャスト
+    const pay_result = await client.submitAndWait(pay_signed.tx_blob);
+
+    if (pay_result.result.meta.TransactionResult == "tesSUCCESS") {
+      console.log(`Transaction succeeded: ${EXPLORER}/transactions/${pay_signed.hash}`)
+    } else {
+      throw `Error sending transaction: ${pay_result.result.meta.TransactionResult}`
+    };
+
+    // Check balances ------------------------------------------------------------
+    console.log("Getting hot address balances...");
+    // get hot address data
+    const balances = await client.request({
+      command: "account_lines",
+      account: wallet.address,
+      ledger_index: "validated"
+    })
+    console.log("wallet address's balance:", balances.result);
+  } catch(err) {
+    console.error("error occuered while swaping:", err);
+  }
+};
 
 /* Issue tokens function ---------------------------------------------------------------
  * Fund a new issuer using the faucet, and issue some fungible tokens

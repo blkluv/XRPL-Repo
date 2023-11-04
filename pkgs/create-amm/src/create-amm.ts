@@ -12,7 +12,8 @@ import {
   confirmAmm,
   createAmm,
   getAmmcost,
-  get_new_token
+  get_new_token,
+  swap
 } from './lib/amm';
 import {
   WS_URL
@@ -66,9 +67,23 @@ async function main() {
   await createAmm(client, wallet, msh_amount, foo_amount, amm_fee_drops)
   
   // Confirm that AMM exists --------------------------------------------------
-  const account_lines_result = await confirmAmm(client, wallet, amm_info_request);
+  const {
+    account_lines_result,
+    ammAddress
+  } = await confirmAmm(client, wallet, amm_info_request);
   
   console.log("account_lines_result:", account_lines_result)
+  console.log("ammAddress:", ammAddress)
+
+  // Swap (payment Transaction)
+  await swap(client, wallet, ammAddress, msh_amount, "1")
+
+  // confirm AMM again
+  const {
+    account_lines_result: account_lines_result2,
+  } = await confirmAmm(client, wallet, amm_info_request);
+  
+  console.log("account_lines_result2:", account_lines_result2)
 
   // Disconnect when done -----------------------------------------------------
   await client.disconnect()

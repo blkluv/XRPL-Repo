@@ -232,3 +232,4 @@ pnpm sample-app-nft run start
 51. [XRPL ドキュメント - AMMDeposit](https://xrpl.org/ammdeposit.html)
 52. [XRPL ドキュメント - AMMVote](https://xrpl.org/ammvote.html)
 53. [XRPL ドキュメント - AMMWithdraw](https://xrpl.org/ammwithdraw.html)
+54. [XRPLのトランザクションコード](https://zenn.dev/tequ/articles/rippled-transaction-code)
