@@ -13,7 +13,11 @@ import {
   createAmm,
   getAmmcost,
   get_new_token,
-  swap
+  swap,
+  bidAmm,
+  voteAmm,
+  depositAmm,
+  withdrawAmm
 } from './lib/amm';
 import {
   WS_URL
@@ -68,15 +72,23 @@ async function main() {
   
   // Confirm that AMM exists --------------------------------------------------
   const {
-    account_lines_result,
-    ammAddress
+    account_lines_result: account_lines_result,
+    ammInfo: ammInfo
   } = await confirmAmm(client, wallet, amm_info_request);
   
   console.log("account_lines_result:", account_lines_result)
-  console.log("ammAddress:", ammAddress)
+  console.log("ammAddress:", ammInfo.issuer)
 
+  // deposit AMM
+  await depositAmm(client, wallet, msh_amount, "10", foo_amount, "10")
+  // withdraw AMM
+  await withdrawAmm(client, wallet, msh_amount, "50", foo_amount, "50")
+  // BidAMM
+  await bidAmm(client, wallet, msh_amount, foo_amount, ammInfo)
+  // VoteAMM
+  await voteAmm(client, wallet, msh_amount, foo_amount, 500)
   // Swap (payment Transaction)
-  await swap(client, wallet, ammAddress, msh_amount, "1")
+  await swap(client, wallet, ammInfo.issuer, msh_amount, foo_amount, "1")
 
   // confirm AMM again
   const {

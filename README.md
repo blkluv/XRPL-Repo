@@ -233,3 +233,4 @@ pnpm sample-app-nft run start
 52. [XRPL ドキュメント - AMMVote](https://xrpl.org/ammvote.html)
 53. [XRPL ドキュメント - AMMWithdraw](https://xrpl.org/ammwithdraw.html)
 54. [XRPLのトランザクションコード](https://zenn.dev/tequ/articles/rippled-transaction-code)
+55. [Pathsに関するサンプルソースコード](https://github.com/XRPLF/xrpl-dev-portal/blob/master/content/_code-samples/paths/js/paths.ts)

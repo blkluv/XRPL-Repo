@@ -178,7 +178,11 @@ export const confirmAmm = async(
     const amount = results.amm.amount
     const amount2 = results.amm.amount2
 
-    const ammAddress = lp_token.issuer;
+    const ammInfo: TokenInfo = {
+      "currency": lp_token.currency,
+      "issuer": lp_token.issuer,
+      "value": "0"
+    }
 
     console.log(`The AMM account ${lp_token.issuer} has ${lp_token.value} total
                 LP tokens outstanding, and uses the currency code ${lp_token.currency}.`)
@@ -195,13 +199,213 @@ export const confirmAmm = async(
     })
     return {
       account_lines_result,
-      ammAddress
+      ammInfo
     };
   } catch(err) {
     console.error("Check token balances err:", err)
     return null;
   }
 }
+
+/**
+ * AMMのオークションスロットに入札するためのメソッド
+ */
+export const bidAmm = async(
+  client: any,
+  wallet: any,
+  token1Info: TokenInfo,
+  token2Info: TokenInfo,
+  ammInfo: TokenInfo
+) => {
+  try {
+    const result = await client.submitAndWait({
+      "TransactionType": "AMMBid",
+      "Account": wallet.address,
+      "Asset": {
+        currency: token1Info.currency,
+        issuer: token1Info.issuer,
+      },
+      "Asset2": {
+        "currency": token2Info.currency,
+        "issuer": token2Info.issuer,
+      },
+      "BidMax" : {
+        "currency" : ammInfo.currency,
+        "issuer" : ammInfo.issuer,
+        "value" : "5"
+      },
+    }, {
+      autofill: true, 
+      wallet: wallet, 
+      failHard: true
+    })
+
+    // get metaData & TransactionResult
+    const metaData: any = result.result.meta!;
+    const transactionResult = metaData.TransactionResult;
+  
+    // Use fail_hard so you don't waste the tx cost if you mess up
+    if (transactionResult == "tesSUCCESS") {
+      console.log(`AMM bid: ${EXPLORER}/transactions/${result.result.hash}`)
+    } else {
+      throw `Error sending transaction: ${JSON.stringify(result)}`
+    }
+  } catch(err) {
+    console.error("error occuered while bidAmm:", err)
+  }
+};
+
+/**
+ * AMMの取引手数料に投票するためのメソッド
+ */
+export const voteAmm = async(
+  client: any,
+  wallet: any,
+  token1Info: TokenInfo,
+  token2Info: TokenInfo,
+  tradingFee: number
+) => {
+  try {
+    const result = await client.submitAndWait({
+      "TransactionType": "AMMVote",
+      "Account": wallet.address,
+      "Asset": {
+        currency: token1Info.currency,
+        issuer: token1Info.issuer,
+      },
+      "Asset2": {
+        "currency": token2Info.currency,
+        "issuer": token2Info.issuer,
+      },
+      "TradingFee" : tradingFee,
+    }, {
+      autofill: true, 
+      wallet: wallet, 
+      failHard: true
+    })
+
+    // get metaData & TransactionResult
+    const metaData: any = result.result.meta!;
+    const transactionResult = metaData.TransactionResult;
+  
+    // Use fail_hard so you don't waste the tx cost if you mess up
+    if (transactionResult == "tesSUCCESS") {
+      console.log(`AMM vote: ${EXPLORER}/transactions/${result.result.hash}`)
+    } else {
+      throw `Error sending transaction: ${JSON.stringify(result)}`
+    }
+  } catch(err) {
+    console.error("error occuered while voteAmm:", err)
+  }
+};
+
+/**
+ * AMMに資金を預け入れてLPトークンを取得するためのメソッド
+ */
+export const depositAmm = async(
+  client: any,
+  wallet: any,
+  token1Info: TokenInfo,
+  token1Amount: string,
+  token2Info: TokenInfo,
+  token2Amount: string,
+) => {
+  try {
+    const result = await client.submitAndWait({
+      "TransactionType": "AMMDeposit",
+      "Account": wallet.address,
+      "Amount": {
+        currency: token1Info.currency,
+        issuer: token1Info.issuer,
+        value: token1Amount
+      },
+      "Amount2": {
+        currency: token2Info.currency,
+        issuer: token2Info.issuer,
+        value: token2Amount
+      },
+      "Asset": {
+        currency: token1Info.currency,
+        issuer: token1Info.issuer,
+      },
+      "Asset2": {
+        "currency": token2Info.currency,
+        "issuer": token2Info.issuer,
+      },
+    }, {
+      autofill: true, 
+      wallet: wallet, 
+      failHard: true
+    })
+
+    // get metaData & TransactionResult
+    const metaData: any = result.result.meta!;
+    const transactionResult = metaData.TransactionResult;
+  
+    // Use fail_hard so you don't waste the tx cost if you mess up
+    if (transactionResult == "tesSUCCESS") {
+      console.log(`AMM deposit: ${EXPLORER}/transactions/${result.result.hash}`)
+    } else {
+      throw `Error sending transaction: ${JSON.stringify(result)}`
+    }
+  } catch(err) {
+    console.error("error occuered while depositAmm:", err)
+  }
+};
+
+/**
+ * AMMにLPトークンを預け入れて資金を入手するためのメソッド
+ */
+export const withdrawAmm = async(
+  client: any,
+  wallet: any,
+  token1Info: TokenInfo,
+  token1Amount: string,
+  token2Info: TokenInfo,
+  token2Amount: string,
+) => {
+  try {
+    const result = await client.submitAndWait({
+      "TransactionType": "AMMWithdraw",
+      "Account": wallet.address,
+      "Amount": {
+        currency: token1Info.currency,
+        issuer: token1Info.issuer,
+        value: token1Amount
+      },
+      "Amount2": {
+        currency: token2Info.currency,
+        issuer: token2Info.issuer,
+        value: token2Amount
+      },
+      "Asset": {
+        currency: token1Info.currency,
+        issuer: token1Info.issuer,
+      },
+      "Asset2": {
+        "currency": token2Info.currency,
+        "issuer": token2Info.issuer,
+      },
+    }, {
+      autofill: true, 
+      wallet: wallet, 
+      failHard: true
+    })
+
+    // get metaData & TransactionResult
+    const metaData: any = result.result.meta!;
+    const transactionResult = metaData.TransactionResult;
+  
+    // Use fail_hard so you don't waste the tx cost if you mess up
+    if (transactionResult == "tesSUCCESS") {
+      console.log(`AMM withdraw: ${EXPLORER}/transactions/${result.result.hash}`)
+    } else {
+      throw `Error sending transaction: ${JSON.stringify(result)}`
+    }
+  } catch(err) {
+    console.error("error occuered while withdrawAmm:", err)
+  }
+};
 
 /**
  * AMMを介してトークンをSwapするメソッド
@@ -217,19 +421,15 @@ export const swap = async(
   wallet: any,
   ammAddress: string,
   token1Info: TokenInfo,
+  token2Info: TokenInfo,
   value: string
 ) => {
   // Swap用のトランザクションデータを作成する
   const swapTxData = {
     "TransactionType": "Payment",
     "Account": wallet.address,
-    "Destination": ammAddress,          // AMMアカウントのアドレスを指定
+    "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
     "Amount": {
-      "currency": token1Info.currency,  // ここで送金したいトークンの種類を指定する。
-      "value": value,                   // ここで送金したいトークンの金額を指定する。
-      "issuer": token1Info.issuer
-    },
-    "SendMax": {
       "currency": token1Info.currency,  // ここで送金したいトークンの種類を指定する。
       "value": value,                   // ここで送金したいトークンの金額を指定する。
       "issuer": token1Info.issuer
