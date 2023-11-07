@@ -315,18 +315,18 @@ export const depositAmm = async(
       "TransactionType": "AMMDeposit",
       "Account": wallet.address,
       "Amount": {
-        currency: token1Info.currency,
-        issuer: token1Info.issuer,
-        value: token1Amount
+        "currency": token1Info.currency,
+        "issuer": token1Info.issuer,
+        "value": token1Amount
       },
       "Amount2": {
-        currency: token2Info.currency,
-        issuer: token2Info.issuer,
-        value: token2Amount
+        "currency": token2Info.currency,
+        "issuer": token2Info.issuer,
+        "value": token2Amount
       },
       "Asset": {
-        currency: token1Info.currency,
-        issuer: token1Info.issuer,
+        "currency": token1Info.currency,
+        "issuer": token1Info.issuer,
       },
       "Asset2": {
         "currency": token2Info.currency,
@@ -369,18 +369,18 @@ export const withdrawAmm = async(
       "TransactionType": "AMMWithdraw",
       "Account": wallet.address,
       "Amount": {
-        currency: token1Info.currency,
-        issuer: token1Info.issuer,
-        value: token1Amount
+        "currency": token1Info.currency,
+        "issuer": token1Info.issuer,
+        "value": token1Amount
       },
       "Amount2": {
-        currency: token2Info.currency,
-        issuer: token2Info.issuer,
-        value: token2Amount
+        "currency": token2Info.currency,
+        "issuer": token2Info.issuer,
+        "value": token2Amount
       },
       "Asset": {
-        currency: token1Info.currency,
-        issuer: token1Info.issuer,
+        "currency": token1Info.currency,
+        "issuer": token1Info.issuer,
       },
       "Asset2": {
         "currency": token2Info.currency,
@@ -424,6 +424,27 @@ export const swap = async(
   token2Info: TokenInfo,
   value: string
 ) => {
+  client.on('path_find', (stream: any) => {
+    console.log(JSON.stringify(stream.alternatives, null, '  '))
+  })
+  // path find
+  const result = client.request({
+    command: 'path_find',
+    subcommand: 'create',
+    source_account: wallet.address,
+    source_amount: {
+      "currency": token1Info.currency,  
+      "value": value,                   
+      "issuer": token1Info.issuer
+    },
+    destination_account: wallet.address,
+    destination_amount: {
+      "currency": token2Info.currency,  
+      "value": value,                   
+      "issuer": token2Info.issuer
+    }
+  });
+
   // Swap用のトランザクションデータを作成する
   const swapTxData = {
     "TransactionType": "Payment",
@@ -434,7 +455,16 @@ export const swap = async(
       "value": value,                   // ここで送金したいトークンの金額を指定する。
       "issuer": token1Info.issuer
     },
-    "DestinationTag": 1 
+    "SendMax": "2",
+    "Paths": [
+      {
+        "currency": token1Info.currency,
+      },
+      {
+        "currency": token2Info.currency,
+      }
+    ],
+    "Flags": 65536
   }
 
   try {

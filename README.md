@@ -234,3 +234,6 @@ pnpm sample-app-nft run start
 53. [XRPL ドキュメント - AMMWithdraw](https://xrpl.org/ammwithdraw.html)
 54. [XRPLのトランザクションコード](https://zenn.dev/tequ/articles/rippled-transaction-code)
 55. [Pathsに関するサンプルソースコード](https://github.com/XRPLF/xrpl-dev-portal/blob/master/content/_code-samples/paths/js/paths.ts)
+56. [XRPL エラーコード](https://xrpl.org/ja/tem-codes.html)
+57. [Web3Auth - XRPL Provider](https://web3auth.io/docs/sdk/helper-sdks/providers/xrpl/)
+58. [【GitHub】xrpl-modal-example](https://github.com/Web3Auth/web3auth-pnp-examples/tree/main/web-modal-sdk/blockchain-connection-examples/xrpl-modal-example)

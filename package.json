@@ -13,7 +13,8 @@
     "simple-xrpl-wallet": "pnpm -F \"simple-xrpl-wallet\"",
     "sample-FT": "pnpm -F \"sample-FT\"",
     "sample-dex": "pnpm -F \"sample-dex\"",
-    "xumm-demo": "pnpm -F \"xumm-demo\""
+    "xumm-demo": "pnpm -F \"xumm-demo\"",
+    "web3Auth-sample": "pnpm -F \"web3Auth-sample\""
   },
   "keywords": [],
   "author": "mashharuki",

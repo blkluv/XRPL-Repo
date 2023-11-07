@@ -80,9 +80,9 @@ async function main() {
   console.log("ammAddress:", ammInfo.issuer)
 
   // deposit AMM
-  await depositAmm(client, wallet, msh_amount, "10", foo_amount, "10")
+  //await depositAmm(client, wallet, msh_amount, "10", foo_amount, "10")
   // withdraw AMM
-  await withdrawAmm(client, wallet, msh_amount, "50", foo_amount, "50")
+  //await withdrawAmm(client, wallet, msh_amount, "50", foo_amount, "50")
   // BidAMM
   await bidAmm(client, wallet, msh_amount, foo_amount, ammInfo)
   // VoteAMM
