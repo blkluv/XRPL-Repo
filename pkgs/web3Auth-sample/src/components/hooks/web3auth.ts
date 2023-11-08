@@ -4,7 +4,7 @@ import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import { Web3Auth } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { XrplPrivateKeyProvider, getXRPLChainConfig } from "@web3auth/xrpl-provider";
-import RPC from "./../../utils/xrplRPC";
+import { init, getAccounts, getBalance } from "./../../utils/xrplRPC";
 
 // 変数
 var web3auth: Web3Auth;
@@ -19,9 +19,11 @@ export const login = async() => {
 
   web3auth = new Web3Auth({
     clientId: env.WEB3_AUTH_CLIENT_ID,
-    web3AuthNetwork: 'testnet',
+    web3AuthNetwork: 'sapphire_mainnet',
     chainConfig: {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
+      chainId: "0x04",
+      rpcTarget: "https://s.altnet.rippletest.net:51234",
     },
   });
 
@@ -42,9 +44,11 @@ export const login = async() => {
   const provider = await web3auth.connect();
   const authenticateUser = await web3auth.authenticateUser();
   const user = await web3auth.getUserInfo();
-  const rpc = new RPC(provider!);
-  const userAccount = await rpc.getAccounts();
-  const balance = await rpc.getBalance();
+  init(provider!);
+  const userAccount = await getAccounts();
+  const balance = await getBalance();
+  //const result = await rpc.signMessage();
+  //const result2 = await rpc.signAndSendTransaction();
   // set idToken
   idToken = authenticateUser.idToken;
 
@@ -52,6 +56,8 @@ export const login = async() => {
   console.log("user:", user)
   console.log("Accpuint info: ", userAccount);
   console.log("Balance", balance);
+  //console.log("result:", result);
+  //console.log("results2:", result2)
   
   return provider;
 }

@@ -14,7 +14,8 @@
     "sample-FT": "pnpm -F \"sample-FT\"",
     "sample-dex": "pnpm -F \"sample-dex\"",
     "xumm-demo": "pnpm -F \"xumm-demo\"",
-    "web3Auth-sample": "pnpm -F \"web3Auth-sample\""
+    "web3Auth-sample": "pnpm -F \"web3Auth-sample\"",
+    "xrpl-modal-example": "pnpm -F \"xrpl-modal-example\""
   },
   "keywords": [],
   "author": "mashharuki",
