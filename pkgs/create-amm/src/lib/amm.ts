@@ -332,6 +332,7 @@ export const depositAmm = async(
         "currency": token2Info.currency,
         "issuer": token2Info.issuer,
       },
+      "Flags" : 1048576,
     }, {
       autofill: true, 
       wallet: wallet, 
@@ -387,6 +388,7 @@ export const withdrawAmm = async(
         "issuer": token2Info.issuer,
       },
       "Fee" : "10",
+      "Flags" : 1048576,
     }, {
       autofill: true, 
       wallet: wallet, 
