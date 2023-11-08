@@ -88,7 +88,7 @@ async function main() {
   // VoteAMM
   await voteAmm(client, wallet, msh_amount, foo_amount, 500)
   // Swap (payment Transaction)
-  await swap(client, wallet, ammInfo.issuer, msh_amount, foo_amount, "1")
+  await swap(client, wallet, ammInfo.issuer, msh_amount, foo_amount, "1", "20")
 
   // confirm AMM again
   const {

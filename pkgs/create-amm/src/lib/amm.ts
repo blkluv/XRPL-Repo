@@ -423,7 +423,8 @@ export const swap = async(
   ammAddress: string,
   token1Info: TokenInfo,
   token2Info: TokenInfo,
-  value: string
+  token1Value: string,
+  token2Value: string
 ) => {
   client.on('path_find', (stream: any) => {
     console.log(JSON.stringify(stream.alternatives, null, '  '))
@@ -434,15 +435,15 @@ export const swap = async(
     subcommand: 'create',
     source_account: wallet.address,
     source_amount: {
-      "currency": token1Info.currency,  
-      "value": value,                   
-      "issuer": token1Info.issuer
+      "currency": token2Info.currency,  
+      "value": token2Value,                   
+      "issuer": token2Info.issuer
     },
     destination_account: wallet.address,
     destination_amount: {
-      "currency": token2Info.currency,  
-      "value": value,                   
-      "issuer": token2Info.issuer
+      "currency": token1Info.currency,  
+      "value": token1Value,                   
+      "issuer": token1Info.issuer
     }
   });
 
@@ -454,32 +455,35 @@ export const swap = async(
     "Account": wallet.address,
     "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
     "Amount": {
-      "currency": token1Info.currency,  // ここで送金したいトークンの種類を指定する。
-      "value": value,                   // ここで送金したいトークンの金額を指定する。
+      "currency": token1Info.currency,        // ここで変換先トークンの種類を指定する。
+      "value": token1Value,                   // ここで変換先トークンの金額を指定する。
       "issuer": token1Info.issuer
     },
     "SendMax": {
-      "currency": token2Info.currency,  // ここで送金したいトークンの種類を指定する。
-      "value": value,                   // ここで送金したいトークンの金額を指定する。
+      "currency": token2Info.currency,  // ここで変換元のトークンの種類を指定する。
+      "value": token2Value,
       "issuer": token2Info.issuer
     },
     "Paths": [
-      {
-        "account": token1Info.issuer
-      },
-      {
-        "currency": token2Info.currency,
-        "issuer": token2Info.issuer
-      }
-    ],
-    "Flags": 65536
+      [
+        {
+          "account": token2Info.issuer,
+          "type": 1
+        },
+        {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+          "type": 48
+        }
+      ]
+    ]
   }
 
   try {
     const pay_prepared = await client.autofill(swapTxData);
     // トランザクションに署名
     const pay_signed = wallet.sign(pay_prepared);
-    console.log(`Sending ${value} ${token1Info.currency} to ${ammAddress}...`)
+    console.log(`Sending ${token1Info} ${token1Info.currency} to ${ammAddress}...`)
     // 署名済みトランザクションをブロードキャスト
     const pay_result = await client.submitAndWait(pay_signed.tx_blob);
 
