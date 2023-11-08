@@ -386,6 +386,7 @@ export const withdrawAmm = async(
         "currency": token2Info.currency,
         "issuer": token2Info.issuer,
       },
+      "Fee" : "10",
     }, {
       autofill: true, 
       wallet: wallet, 
@@ -428,7 +429,7 @@ export const swap = async(
     console.log(JSON.stringify(stream.alternatives, null, '  '))
   })
   // path find
-  const result = client.request({
+  const result = await client.request({
     command: 'path_find',
     subcommand: 'create',
     source_account: wallet.address,
@@ -445,6 +446,8 @@ export const swap = async(
     }
   });
 
+  console.log("path find:", result)
+
   // Swap用のトランザクションデータを作成する
   const swapTxData = {
     "TransactionType": "Payment",
@@ -455,13 +458,18 @@ export const swap = async(
       "value": value,                   // ここで送金したいトークンの金額を指定する。
       "issuer": token1Info.issuer
     },
-    "SendMax": "2",
+    "SendMax": {
+      "currency": token2Info.currency,  // ここで送金したいトークンの種類を指定する。
+      "value": value,                   // ここで送金したいトークンの金額を指定する。
+      "issuer": token2Info.issuer
+    },
     "Paths": [
       {
-        "currency": token1Info.currency,
+        "account": token1Info.issuer
       },
       {
         "currency": token2Info.currency,
+        "issuer": token2Info.issuer
       }
     ],
     "Flags": 65536

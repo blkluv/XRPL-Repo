@@ -80,9 +80,9 @@ async function main() {
   console.log("ammAddress:", ammInfo.issuer)
 
   // deposit AMM
-  //await depositAmm(client, wallet, msh_amount, "10", foo_amount, "10")
+  //await depositAmm(client, wallet, msh_amount, "15", foo_amount, "100")
   // withdraw AMM
-  //await withdrawAmm(client, wallet, msh_amount, "50", foo_amount, "50")
+  //await withdrawAmm(client, wallet, msh_amount, "5", foo_amount, "5")
   // BidAMM
   await bidAmm(client, wallet, msh_amount, foo_amount, ammInfo)
   // VoteAMM
@@ -95,7 +95,7 @@ async function main() {
     account_lines_result: account_lines_result2,
   } = await confirmAmm(client, wallet, amm_info_request);
   
-  console.log("account_lines_result2:", account_lines_result2)
+  //console.log("account_lines_result2:", account_lines_result2)
 
   // Disconnect when done -----------------------------------------------------
   await client.disconnect()
