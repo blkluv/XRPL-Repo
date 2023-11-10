@@ -89,3 +89,4 @@ XRPL がネイティブでサポートしている(もしくはしようとし�
 14. [暗号資産（仮想通貨）の価格はなぜ上がる？仕組みを理解し急騰に備えよう！](https://coincheck.com/ja/article/271)
 15. [Zenn - AMMとは](https://zenn.dev/tequ/articles/overview-dex-amm)
 16. [XRPL Payment トランザクション](https://xrpl.org/payment.html)
+17. [Figma(DCCEX)](https://www.figma.com/file/rHxfzc9xX9TECtc9wdNFak/DCCEX?type=whiteboard&t=8vtQteB0TSulxFDp-1)

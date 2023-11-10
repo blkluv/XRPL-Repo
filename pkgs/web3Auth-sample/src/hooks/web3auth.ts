@@ -1,10 +1,10 @@
-import { ResponseData } from "../../pages/api/env";
-import { getEnv } from "../../utils/getEnv";
+import { ResponseData } from "../pages/api/env";
+import { getEnv } from "../utils/getEnv";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import { Web3Auth } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { XrplPrivateKeyProvider, getXRPLChainConfig } from "@web3auth/xrpl-provider";
-import { init, getAccounts, getBalance } from "./../../utils/xrplRPC";
+import { init, getAccounts, getBalance } from "./xrpl";
 
 // 変数
 var web3auth: Web3Auth;
@@ -22,8 +22,6 @@ export const login = async() => {
     web3AuthNetwork: 'sapphire_mainnet',
     chainConfig: {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
-      chainId: "0x04",
-      rpcTarget: "https://s.altnet.rippletest.net:51234",
     },
   });
 
