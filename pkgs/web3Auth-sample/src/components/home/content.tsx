@@ -27,7 +27,7 @@ export const Content = () => {
                   <PageHeader/>
                   <div className="h-full flex flex-col gap-2">
                     <div className="w-full bg-default-50 shadow-lg rounded-2xl p-6 text-center">
-                      ここにSWAP用のコンポーネント
+                      ここにSWAP用のコンポーネント<br/>
                     </div>
                   </div>
                 </>
