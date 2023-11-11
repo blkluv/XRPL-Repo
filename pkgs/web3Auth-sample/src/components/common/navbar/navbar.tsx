@@ -1,14 +1,16 @@
-import { Link, Navbar, NavbarContent, NavbarItem} from "@nextui-org/react";
+import { Navbar, NavbarContent, NavbarItem } from "@nextui-org/react";
 import React from "react";
-import { GithubIcon } from "../icons/navbar/github-icon";
-import { login } from "../../hooks/web3auth";
+import { login } from "../../../hooks/xumm";
 
 interface Props {
   children: React.ReactNode;
 }
 
+/**
+ * ログインメソッド
+ */
 const logIn = async() => {
-  const provider = await login();
+  const account = await login();
 }
 
 /**

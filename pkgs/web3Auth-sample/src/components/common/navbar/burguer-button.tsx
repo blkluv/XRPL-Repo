@@ -1,5 +1,4 @@
-import React from "react";
-import { useSidebarContext } from "../layout/layout-context";
+import { useSidebarContext } from "../../layout/layout-context";
 import { StyledBurgerButton } from "./navbar.styles";
 
 export const BurguerButton = () => {

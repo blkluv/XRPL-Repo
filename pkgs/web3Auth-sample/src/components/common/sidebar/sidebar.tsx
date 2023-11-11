@@ -1,13 +1,12 @@
-import React from "react";
-import { Sidebar } from "./sidebar.styles";
-import iconImage from "../../public/DCCEX.png";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import iconImage from "../../../public/DCCEX.png";
+import { useSidebarContext } from "../../layout/layout-context";
+import { AccountsIcon } from "../icons/sidebar/accounts-icon";
 import { HomeIcon } from "../icons/sidebar/home-icon";
 import { PaymentsIcon } from "../icons/sidebar/payments-icon";
-import { AccountsIcon } from "../icons/sidebar/accounts-icon";
 import { SidebarItem } from "./sidebar-item";
-import { useSidebarContext } from "../layout/layout-context";
-import { useRouter } from "next/router";
-import Image from "next/image";
+import { Sidebar } from "./sidebar.styles";
 
 /**
  * SidebarWrapper Component
