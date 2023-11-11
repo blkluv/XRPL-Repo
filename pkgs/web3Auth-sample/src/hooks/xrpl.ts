@@ -11,7 +11,6 @@ export const init = (setProvider: IProvider) => {
   provider = setProvider;
 }
 
-
 export const getAccounts = async (): Promise<any> => {
   try {
     const accounts = await provider.request<never, string[]>({
