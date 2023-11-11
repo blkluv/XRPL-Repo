@@ -39,21 +39,22 @@ export const SidebarWrapper = () => {
               href="/"
             />
             <SidebarItem
-              isActive={router.pathname === "/payments"}
+              isActive={router.pathname === "/pools"}
               title="Pools"
               icon={<PaymentsIcon />}
+              href="/pools"
             />
             <SidebarItem
-              isActive={router.pathname === "/accounts"}
+              isActive={router.pathname === "/createToken"}
               title="CreateToken"
               icon={<AccountsIcon />}
-              href="accounts"
+              href="/createToken"
             />
              <SidebarItem
-              isActive={router.pathname === "/accounts"}
+              isActive={router.pathname === "/faucet"}
               title="Faucet"
               icon={<AccountsIcon />}
-              href="accounts"
+              href="/faucet"
             />
           </div>  
         </div>
