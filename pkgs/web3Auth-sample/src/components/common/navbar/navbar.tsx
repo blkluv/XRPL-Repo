@@ -1,16 +1,9 @@
+import { XummContext } from '@/context/XummProvider';
 import { Navbar, NavbarContent, NavbarItem } from "@nextui-org/react";
-import React from "react";
-import { login } from "../../../hooks/xumm";
+import React, { useContext } from "react";
 
 interface Props {
   children: React.ReactNode;
-}
-
-/**
- * ログインメソッド
- */
-const logIn = async() => {
-  const account = await login();
 }
 
 /**
@@ -19,6 +12,12 @@ const logIn = async() => {
  * @returns 
  */
 export const NavbarWrapper = ({ children }: Props) => {
+  const xumm = useContext(XummContext);
+
+  const logIn = async() => {
+    await xumm.login();
+  }
+
   return (
     <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden md:p-6">
       <Navbar
