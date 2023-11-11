@@ -1,6 +1,7 @@
+import { GlobalContext } from '@/context/GlobalProvider';
 import { WS_URL } from "@/utils/consts";
 import { getEnv } from "@/utils/getEnv";
-import React, { createContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Client, dropsToXrp } from 'xrpl';
 import { Xumm } from "xumm";
 
@@ -22,6 +23,8 @@ export const XummProvider = ({
   const [balance, setBalance] = useState<string | null>();
   const [xumm, setXumm] = useState<Xumm | null>();
 
+  const globalContext = useContext(GlobalContext);
+
   /**
    * 初期化＆認証メソッド
    */
@@ -31,16 +34,24 @@ export const XummProvider = ({
     // XUMM用のインスタンスを作成する。
     const newXumm = new Xumm(XRP_API_KEY);
 
-    // authorize
-    await newXumm.authorize();
-    const account = await newXumm.user.account;
-    const userInfo = await newXumm.user;
-    console.log("user info:", userInfo);
-    console.log("account address:", account);
+    try {
+      globalContext.setLoading(true)
+
+      // authorize
+      await newXumm.authorize();
+      const account = await newXumm.user.account;
+      const userInfo = await newXumm.user;
+      console.log("user info:", userInfo);
+      console.log("account address:", account);
   
-    setAddress(account);
-    setXumm(newXumm);
-    await getAccountInfo(account!);
+      setAddress(account);
+      setXumm(newXumm);
+      await getAccountInfo(account!);
+    } catch(err) {
+      console.error("eer:", err)
+    } finally {
+      globalContext.setLoading(false)
+    }
   }
 
   /**

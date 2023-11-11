@@ -1,3 +1,4 @@
+import { GlobalProvider } from "@/context/GlobalProvider";
 import { XummProvider } from "@/context/XummProvider";
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
@@ -14,11 +15,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <NextThemesProvider defaultTheme="system" attribute="class">
       <NextUIProvider>
-        <XummProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </XummProvider>
+        <GlobalProvider>
+          <XummProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </XummProvider>
+        </GlobalProvider>
       </NextUIProvider>
     </NextThemesProvider>
   );
