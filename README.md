@@ -239,3 +239,5 @@ pnpm sample-app-nft run start
 58. [【GitHub】xrpl-modal-example](https://github.com/Web3Auth/web3auth-pnp-examples/tree/main/web-modal-sdk/blockchain-connection-examples/xrpl-modal-example)
 59. [Ripple Docs Automated Market Maker](https://opensource.ripple.com/docs/xls-30d-amm/amm-uc/)
 60. [TailwindCSS Component live preview](https://tailwindui.com/components/preview)
+61. [【Supabase】Build a User Management App with Next.js](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs?database-method=dashboard&language=ts#project-setup)
+62. [Use Supabase with Next.js](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs)

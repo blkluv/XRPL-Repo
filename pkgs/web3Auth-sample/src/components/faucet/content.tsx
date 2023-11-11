@@ -1,14 +1,33 @@
 import { GlobalContext } from '@/context/GlobalProvider';
 import { XummContext } from '@/context/XummProvider';
-import { useContext } from "react";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+} from "@nextui-org/react";
+import Image from 'next/image';
+import { useContext, useState } from "react";
+import iconImage from "../../public/DCCEX.png";
 import { PageHeader } from "../common/pageHeader";
 import Spinner from '../common/spinner';
+
+type Currency = {
+  name: string;
+  currency: number;
+}
 
 /**
  * FaucetContent Component
  * @returns 
  */
 export const FaucetContent = () => {
+  const [token, setToken] = useState<Currency>({
+    name: "XRP",
+    currency: 0
+  });
+
   const xumm = useContext(XummContext);
   const globalContext = useContext(GlobalContext);
 
@@ -28,7 +47,88 @@ export const FaucetContent = () => {
                   <PageHeader/>
                   <div className="h-full flex flex-col gap-2">
                     <div className="w-full bg-default-50 shadow-lg rounded-2xl p-6 text-center">
-                      ここにFaucet用のコンポーネント
+                      <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+                        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                          <Image 
+                            className="mx-auto h-10 w-auto" 
+                            src={iconImage}
+                            alt="DECCEX"
+                          />
+                          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white-900">
+                            Faucet Page
+                          </h2>
+                        </div>
+                        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                          <form className="space-y-6" action="#" method="POST">
+                            <div>
+                              <label htmlFor="token" className="block font-medium leading-6 text-white-900 p-4">
+                                <h2>Please Select Token</h2>
+                              </label>
+                              <Dropdown
+                                classNames={{
+                                  base: "w-full min-w-[260px]",
+                                }}
+                              >
+                                <DropdownTrigger className="cursor-pointer">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex flex-col gap-4">
+                                      <h3 className="text-xl font-medium m-0 text-default-900 -mb-4 whitespace-nowrap">
+                                        {token.name}
+                                      </h3>
+                                    </div>
+                                  </div>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                  onAction={(e) => {
+                                    if (e === "0") {
+                                      setToken({
+                                        name: "XRP",
+                                        currency: 0,
+                                      });
+                                    }
+                                    if (e === "1") {
+                                      setToken({
+                                        name: "Test Token",
+                                        currency: 1,
+                                      });
+                                    }
+                                  }}
+                                  aria-label="Avatar Actions"
+                                >
+                                  <DropdownSection title="tokens">
+                                    <DropdownItem
+                                      key="0"
+                                      classNames={{
+                                        base: "py-4",
+                                        title: "text-base font-semibold",
+                                      }}
+                                    >
+                                      XRP
+                                    </DropdownItem>
+                                    <DropdownItem
+                                      key="1"
+                                      classNames={{
+                                        base: "py-4",
+                                        title: "text-base font-semibold",
+                                      }}
+                                    >
+                                      Test Token
+                                    </DropdownItem>
+                                  </DropdownSection>
+                                </DropdownMenu>
+                              </Dropdown>
+                            </div>
+                            <div>
+                              <button 
+                                type="button" 
+                                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                              >
+                                Faucet
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
