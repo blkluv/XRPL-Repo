@@ -50,7 +50,7 @@ export const FaucetContent = () => {
                       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
                         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                           <Image 
-                            className="mx-auto h-10 w-auto" 
+                            className="mx-auto h-20 w-auto" 
                             src={iconImage}
                             alt="DECCEX"
                           />
@@ -62,7 +62,7 @@ export const FaucetContent = () => {
                           <form className="space-y-6" action="#" method="POST">
                             <div>
                               <label htmlFor="token" className="block font-medium leading-6 text-white-900 p-4">
-                                <h2>Please Select Token</h2>
+                                <h2>You can get Test XRP!!</h2>
                               </label>
                               <Dropdown
                                 classNames={{
@@ -122,6 +122,7 @@ export const FaucetContent = () => {
                               <button 
                                 type="button" 
                                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                onClick={async () => {await xumm.sendFaucet(xumm.address)}}
                               >
                                 Faucet
                               </button>

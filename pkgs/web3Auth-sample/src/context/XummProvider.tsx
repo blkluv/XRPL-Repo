@@ -2,7 +2,7 @@ import { GlobalContext } from '@/context/GlobalProvider';
 import { WS_URL } from "@/utils/consts";
 import { getEnv } from "@/utils/getEnv";
 import React, { createContext, useContext, useState } from 'react';
-import { Client, dropsToXrp } from 'xrpl';
+import { Client, Wallet, dropsToXrp, xrpToDrops } from 'xrpl';
 import { Xumm } from "xumm";
 
 // XRPLインスタンスを作成
@@ -83,12 +83,46 @@ export const XummProvider = ({
     }
   };
 
+  /**
+   * faucet用のXRP 送信トランザクション
+   */
+  const sendFaucet = async(destination: string) => {
+    try {
+      globalContext.setLoading(true)
+      // Connect to the client   
+      await client.connect();
+      // get env
+      const { FAUCET_SEED } = await getEnv();
+      // Create a wallet using the seed
+      const wallet = await Wallet.fromSeed(FAUCET_SEED);
+
+      // tx data
+      const tx: any = {
+        TransactionType: 'Payment',
+        Amount: xrpToDrops(5), 
+        Destination: destination,
+      }
+
+      tx.Account = wallet.address;
+      // send faucet XRP
+      const response = await client.submit(tx, { wallet });
+      console.log("send FAUCET XRP res:", response);
+      await getAccountInfo(address!);
+    } catch (error) { 
+      console.error("send FAUCET XRP err", error);
+    }finally {
+      await client.disconnect();
+      globalContext.setLoading(false);
+    }
+  }
+
   // 状態と関数をオブジェクトにラップして、プロバイダーに引き渡す
   const global = {
     address,
     balance,
     xumm,
-    login
+    login,
+    sendFaucet
   }
 
   return (
