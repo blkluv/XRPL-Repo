@@ -3,6 +3,7 @@ import { XummContext } from '@/context/XummProvider';
 import { useContext } from "react";
 import { PageHeader } from "../common/pageHeader";
 import Spinner from '../common/spinner';
+import { CreateForm } from './createForm/createForm';
 
 
 /**
@@ -29,7 +30,7 @@ export const CreateTokenContent = () => {
                   <PageHeader/>
                   <div className="h-full flex flex-col gap-2">
                     <div className="w-full bg-default-50 shadow-lg rounded-2xl p-6 text-center">
-                      ここにCreateToken用のコンポーネント
+                      <CreateForm />
                     </div>
                   </div>
                 </>

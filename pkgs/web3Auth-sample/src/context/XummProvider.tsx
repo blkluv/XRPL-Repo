@@ -107,9 +107,13 @@ export const XummProvider = ({
       // send faucet XRP
       const response = await client.submit(tx, { wallet });
       console.log("send FAUCET XRP res:", response);
-      await getAccountInfo(address!);
+      // 5秒後に新しい残高を取得
+      setTimeout(async function() {
+        await getAccountInfo(address!);
+      }, 5000);
     } catch (error) { 
       console.error("send FAUCET XRP err", error);
+      globalContext.setLoading(false);
     }finally {
       await client.disconnect();
       globalContext.setLoading(false);
