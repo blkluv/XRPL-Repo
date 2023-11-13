@@ -1,20 +1,22 @@
 import {
-  Link,
   Table,
   TableBody,
   TableCell,
   TableColumn,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@nextui-org/react";
-import React from "react";
-import { columns, users } from "./data";
+import { columns, lpTokens } from "./data";
 import { RenderCell } from "./render-cell";
 
+/**
+ * TableWrapper Component
+ * @returns 
+ */
 export const TableWrapper = () => {
   return (
     <div className=" w-full flex flex-col gap-4">
-      <Table aria-label="Example table with custom cells">
+      <Table aria-label="pools table">
         <TableHeader columns={columns}>
           {(column) => (
             <TableColumn
@@ -26,12 +28,17 @@ export const TableWrapper = () => {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody items={users}>
+        <TableBody 
+          items={lpTokens}
+        >
           {(item) => (
             <TableRow>
               {(columnKey) => (
                 <TableCell>
-                  {RenderCell({ user: item, columnKey: columnKey })}
+                  {RenderCell({ 
+                    lpToken: item, 
+                    columnKey: columnKey 
+                  })}
                 </TableCell>
               )}
             </TableRow>

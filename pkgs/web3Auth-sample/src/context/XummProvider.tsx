@@ -120,6 +120,22 @@ export const XummProvider = ({
     }
   }
 
+  /**
+   * トークンを新しく作るメソッド
+   */
+
+  /**
+   * AMM Deposit
+   */
+
+  /**
+   * AMM Withdraw
+   */
+
+  /**
+   * Swap
+   */
+
   // 状態と関数をオブジェクトにラップして、プロバイダーに引き渡す
   const global = {
     address,
