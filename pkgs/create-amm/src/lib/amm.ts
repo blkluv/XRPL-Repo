@@ -3,10 +3,10 @@ import {
   EXPLORER
 } from './../util/consts';
 
-type TokenInfo = {
-  "currency": string;
+export type TokenInfo = {
+  "currency": string | null;
   "value": string;
-  "issuer": string;
+  "issuer": string | null;
 }
 
 export type AmmInfo = {
@@ -17,8 +17,8 @@ export type AmmInfo = {
   },
   "asset2": {
     "currency": string;
-    "issuer": string;
-  },
+    "issuer": string | null;
+  } | null,
   "ledger_index": "validated"
 }
 
@@ -79,7 +79,7 @@ export const checkExistsAmm = async (
   client: any,
   amm_info_request: AmmInfo, 
   token1Info: TokenInfo,
-  token2Info: TokenInfo
+  token2Info: TokenInfo,
 ) => {
 
   try {
@@ -87,10 +87,17 @@ export const checkExistsAmm = async (
     console.log(amm_info_result)
   } catch(err: any) {
     if (err.data.error === 'actNotFound') {
-      console.log(`No AMM exists yet for the pair
-                   ${token2Info.currency}.${token2Info.issuer} /
-                   ${token1Info.currency}.${token1Info.issuer}
-                   (This is probably as expected.)`)
+      if(token2Info.issuer != null) {
+        console.log(`No AMM exists yet for the pair
+          ${token2Info.currency}.${token2Info.issuer} /
+          ${token1Info.currency}.${token1Info.issuer}
+          (This is probably as expected.)`)
+      } else {
+        console.log(`No AMM exists yet for the pair
+          XRP /
+          ${token1Info.currency}.${token1Info.issuer}
+          (This is probably as expected.)`)
+      }
     } else {
       throw(err)
     }
@@ -123,26 +130,46 @@ export const createAmm = async(
   amm_fee_drops: string,
 ) => {
   try {
-    const ammcreate_result = await client.submitAndWait({
-      "TransactionType": "AMMCreate",
-      "Account": wallet.address,
-      "Amount": {
-        currency: token1Info.currency,
-        issuer: token1Info.issuer,
-        value: "15"
-      },
-      "Amount2": {
-        "currency": token2Info.currency,
-        "issuer": token2Info.issuer,
-        "value": "100"
-      },
-      "TradingFee": 500, // 0.5%
-      "Fee": amm_fee_drops
-    }, {
-      autofill: true, 
-      wallet: wallet, 
-      failHard: true
-    })
+    var ammcreate_result;
+    if(token2Info.currency != null) {
+      ammcreate_result = await client.submitAndWait({
+        "TransactionType": "AMMCreate",
+        "Account": wallet.address,
+        "Amount": {
+          currency: token1Info.currency,
+          issuer: token1Info.issuer,
+          value: "15"
+        },
+        "Amount2": {
+          "currency": token2Info.currency,
+          "issuer": token2Info.issuer,
+          "value": "100"
+        },
+        "TradingFee": 500, // 0.5%
+        "Fee": amm_fee_drops
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+    } else {
+      ammcreate_result = await client.submitAndWait({
+        "TransactionType": "AMMCreate",
+        "Account": wallet.address,
+        "Amount": {
+          currency: token1Info.currency,
+          issuer: token1Info.issuer,
+          value: "15"
+        },
+        "Amount2": token2Info.value,
+        "TradingFee": 500, // 0.5%
+        "Fee": amm_fee_drops
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+    }
 
     // get metaData & TransactionResult
     const metaData: any = ammcreate_result.result.meta!;
@@ -311,33 +338,60 @@ export const depositAmm = async(
   token2Amount: string,
 ) => {
   try {
-    const result = await client.submitAndWait({
-      "TransactionType": "AMMDeposit",
-      "Account": wallet.address,
-      "Amount": {
-        "currency": token1Info.currency,
-        "issuer": token1Info.issuer,
-        "value": token1Amount
-      },
-      "Amount2": {
-        "currency": token2Info.currency,
-        "issuer": token2Info.issuer,
-        "value": token2Amount
-      },
-      "Asset": {
-        "currency": token1Info.currency,
-        "issuer": token1Info.issuer,
-      },
-      "Asset2": {
-        "currency": token2Info.currency,
-        "issuer": token2Info.issuer,
-      },
-      "Flags" : 1048576,
-    }, {
-      autofill: true, 
-      wallet: wallet, 
-      failHard: true
-    })
+    var result;
+    if(token2Info.currency != null) {
+      result = await client.submitAndWait({
+        "TransactionType": "AMMDeposit",
+        "Account": wallet.address,
+        "Amount": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+          "value": token1Amount
+        },
+        "Amount2": {
+          "currency": token2Info.currency,
+          "issuer": token2Info.issuer,
+          "value": token2Amount
+        },
+        "Asset": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+        },
+        "Asset2": {
+          "currency": token2Info.currency,
+          "issuer": token2Info.issuer,
+        },
+        "Flags" : 1048576,
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+    } else {
+      result = await client.submitAndWait({
+        "TransactionType": "AMMDeposit",
+        "Account": wallet.address,
+        "Amount": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+          "value": token1Amount
+        },
+        "Amount2": token2Amount,
+        "Asset": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+        },
+        "Asset2": { 
+          "currency": "XRP"
+        },
+        "Flags" : 1048576,
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+    }
+    
 
     // get metaData & TransactionResult
     const metaData: any = result.result.meta!;
@@ -366,34 +420,62 @@ export const withdrawAmm = async(
   token2Amount: string,
 ) => {
   try {
-    const result = await client.submitAndWait({
-      "TransactionType": "AMMWithdraw",
-      "Account": wallet.address,
-      "Amount": {
-        "currency": token1Info.currency,
-        "issuer": token1Info.issuer,
-        "value": token1Amount
-      },
-      "Amount2": {
-        "currency": token2Info.currency,
-        "issuer": token2Info.issuer,
-        "value": token2Amount
-      },
-      "Asset": {
-        "currency": token1Info.currency,
-        "issuer": token1Info.issuer,
-      },
-      "Asset2": {
-        "currency": token2Info.currency,
-        "issuer": token2Info.issuer,
-      },
-      "Fee" : "10",
-      "Flags" : 1048576,
-    }, {
-      autofill: true, 
-      wallet: wallet, 
-      failHard: true
-    })
+    var result;
+    
+    if(token2Info.currency != null) { 
+      result = await client.submitAndWait({
+        "TransactionType": "AMMWithdraw",
+        "Account": wallet.address,
+        "Amount": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+          "value": token1Amount
+        },
+        "Amount2": {
+          "currency": token2Info.currency,
+          "issuer": token2Info.issuer,
+          "value": token2Amount
+        },
+        "Asset": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+        },
+        "Asset2": {
+          "currency": token2Info.currency,
+          "issuer": token2Info.issuer,
+        },
+        "Fee" : "10",
+        "Flags" : 1048576,
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+    } else {
+      result = await client.submitAndWait({
+        "TransactionType": "AMMWithdraw",
+        "Account": wallet.address,
+        "Amount": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+          "value": token1Amount
+        },
+        "Amount2": token2Amount,
+        "Asset": {
+          "currency": token1Info.currency,
+          "issuer": token1Info.issuer,
+        },
+        "Asset2": {
+          "currency": "XRP"
+        },
+        "Fee" : "10",
+        "Flags" : 1048576,
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+    }
 
     // get metaData & TransactionResult
     const metaData: any = result.result.meta!;
@@ -432,55 +514,106 @@ export const swap = async(
     console.log(JSON.stringify(stream.alternatives, null, '  '))
   })
   // path find
-  const result = await client.request({
-    command: 'path_find',
-    subcommand: 'create',
-    source_account: wallet.address,
-    source_amount: {
-      "currency": token2Info.currency,  
-      "value": token2Value,                   
-      "issuer": token2Info.issuer
-    },
-    destination_account: wallet.address,
-    destination_amount: {
-      "currency": token1Info.currency,  
-      "value": token1Value,                   
-      "issuer": token1Info.issuer
-    }
-  });
+  var result; 
+  
+  if(token2Info.currency != null) { 
+    result = await client.request({
+      command: 'path_find',
+      subcommand: 'create',
+      source_account: wallet.address,
+      source_amount: {
+        "currency": token2Info.currency,  
+        "value": token2Value,                   
+        "issuer": token2Info.issuer
+      },
+      destination_account: wallet.address,
+      destination_amount: {
+        "currency": token1Info.currency,  
+        "value": token1Value,                   
+        "issuer": token1Info.issuer
+      }
+    });
+  } else {
+    result = await client.request({
+      command: 'path_find',
+      subcommand: 'create',
+      source_account: wallet.address,
+      source_amount: {
+        "currency": "XRP",
+      },
+      destination_account: wallet.address,
+      destination_amount: {
+        "currency": token1Info.currency,  
+        "value": token1Value,                   
+        "issuer": token1Info.issuer
+      }
+    });
+  }
 
   console.log("path find:", result)
 
   // Swap用のトランザクションデータを作成する
-  const swapTxData = {
-    "TransactionType": "Payment",
-    "Account": wallet.address,
-    "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
-    "Amount": {
-      "currency": token1Info.currency,        // ここで変換先トークンの種類を指定する。
-      "value": token1Value,                   // ここで変換先トークンの金額を指定する。
-      "issuer": token1Info.issuer
-    },
-    "SendMax": {
-      "currency": token2Info.currency,  // ここで変換元のトークンの種類を指定する。
-      "value": token2Value,
-      "issuer": token2Info.issuer
-    },
-    "Paths": [
-      [
-        {
-          "account": token2Info.issuer,
-          "type": 1
-        },
-        {
-          "currency": token1Info.currency,
-          "issuer": token1Info.issuer,
-          "type": 48
-        }
+  var swapTxData;
+  if(token2Info.currency != null) { 
+    swapTxData = {
+      "TransactionType": "Payment",
+      "Account": wallet.address,
+      "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
+      "Amount": {
+        "currency": token1Info.currency,        // ここで変換先トークンの種類を指定する。
+        "value": token1Value,                   // ここで変換先トークンの金額を指定する。
+        "issuer": token1Info.issuer
+      },
+      "SendMax": {
+        "currency": token2Info.currency,  // ここで変換元のトークンの種類を指定する。
+        "value": token2Value,
+        "issuer": token2Info.issuer
+      },
+      "Paths": [
+        [
+          {
+            "account": token2Info.issuer,
+            "type": 1
+          },
+          {
+            "currency": token1Info.currency,
+            "issuer": token1Info.issuer,
+            "type": 48
+          }
+        ]
       ]
-    ]
+    }
+  } else {
+    swapTxData = {
+      "TransactionType": "Payment",
+      "Account": wallet.address,
+      "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
+      "Amount": {
+        "currency": token1Info.currency,        // ここで変換先トークンの種類を指定する。
+        "value": token1Value,                   // ここで変換先トークンの金額を指定する。
+        "issuer": token1Info.issuer
+      },
+      "SendMax": token2Value,
+      "Paths": [
+        [
+          {
+            "account": wallet.address,
+            "type": 1
+          },
+          {
+            "account": "XRP",
+            "type": 16
+          },
+          {
+            "currency": token1Info.currency,
+            "issuer": token1Info.issuer,
+            "type": 48
+          }
+        ]
+      ]
+    }
   }
-
+  
   try {
     const pay_prepared = await client.autofill(swapTxData);
     // トランザクションに署名

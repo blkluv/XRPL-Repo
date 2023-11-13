@@ -7,16 +7,17 @@ var xrpl = require('xrpl')
 require('util').inspect.defaultOptions.depth = 5
 import {
   AmmInfo,
+  TokenInfo,
   acquireTokens,
+  bidAmm,
   checkExistsAmm,
   confirmAmm,
   createAmm,
+  depositAmm,
   getAmmcost,
   get_new_token,
   swap,
-  bidAmm,
   voteAmm,
-  depositAmm,
   withdrawAmm
 } from './lib/amm';
 import {
@@ -50,12 +51,12 @@ async function main() {
   const amm_info_request: AmmInfo = {
     "command": "amm_info",
     "asset": {
-      "currency": msh_amount.currency,
-      "issuer": msh_amount.issuer,
+      "currency": msh_amount.currency!,
+      "issuer": msh_amount.issuer!,
     },
     "asset2": {
-      "currency": foo_amount.currency,
-      "issuer": foo_amount.issuer
+      "currency": foo_amount.currency!,
+      "issuer": foo_amount.issuer!
     },
     "ledger_index": "validated"
   }
@@ -76,7 +77,7 @@ async function main() {
     ammInfo: ammInfo
   } = await confirmAmm(client, wallet, amm_info_request);
   
-  console.log("account_lines_result:", account_lines_result)
+  // console.log("account_lines_result:", account_lines_result)
   console.log("ammAddress:", ammInfo.issuer)
 
   // deposit AMM
@@ -96,6 +97,50 @@ async function main() {
   } = await confirmAmm(client, wallet, amm_info_request);
   
   //console.log("account_lines_result2:", account_lines_result2)
+
+  // ============= (another XRP pattern) ===============
+
+  // create AMM Info (another XRP pattern)
+  const amm_info_request2: AmmInfo = {
+    "command": "amm_info",
+    "asset": {
+      "currency": msh_amount.currency!,
+      "issuer": msh_amount.issuer!,
+    },
+    "asset2": {
+      "currency": "XRP",
+      "issuer": null
+    },
+    "ledger_index": "validated"
+  }
+
+  // create XRP Amount info
+  const xrpInfo: TokenInfo = {
+    "currency": null,
+    "value": "10",
+    "issuer": null
+  }
+
+  // Check if AMM already exists ----------------------------------------------
+  await checkExistsAmm(client, amm_info_request2, msh_amount, xrpInfo);
+  // Create AMM ---------------------------------------------------------------
+  // This example assumes that 15 TST ≈ 100 FOO in value.
+  await createAmm(client, wallet, msh_amount, xrpInfo, amm_fee_drops)
+  
+  // Confirm that AMM exists --------------------------------------------------
+  const {
+    ammInfo: ammInfo2
+  } = await confirmAmm(client, wallet, amm_info_request2);
+  
+  // console.log("account_lines_result:", account_lines_result)
+  console.log("ammAddress2:", ammInfo2.issuer)
+  // deposit AMM
+  await depositAmm(client, wallet, msh_amount, "15", xrpInfo, "10")
+  // withdraw AMM
+  await withdrawAmm(client, wallet, msh_amount, "5", xrpInfo, "5")
+  // Swap (payment Transaction)
+  await swap(client, wallet, ammInfo.issuer, msh_amount, xrpInfo, "1", "5")
+
 
   // Disconnect when done -----------------------------------------------------
   await client.disconnect()
