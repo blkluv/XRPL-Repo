@@ -27,9 +27,12 @@
   - id
   - token1 の currency
   - token1 の issuer
+  - token1 の balance
   - token2 の currency
   - token2 の issuer
+  - token2 の balance
   - LP トークンの currencyCode
+  - LP トークンの残高
 
 - CarbonCresits
   - id
