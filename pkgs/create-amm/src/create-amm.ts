@@ -89,7 +89,7 @@ async function main() {
   // VoteAMM
   await voteAmm(client, wallet, msh_amount, foo_amount, 500)
   // Swap (payment Transaction)
-  await swap(client, wallet, ammInfo.issuer, msh_amount, foo_amount, "1", "20")
+  await swap(client, wallet, ammInfo.issuer, msh_amount, foo_amount, "1", "2")
 
   // confirm AMM again
   const {
@@ -139,7 +139,7 @@ async function main() {
   // withdraw AMM
   await withdrawAmm(client, wallet, msh_amount, "5", xrpInfo, "5")
   // Swap (payment Transaction)
-  await swap(client, wallet, ammInfo.issuer, msh_amount, xrpInfo, "1", "5")
+  await swap(client, wallet, ammInfo2.issuer, msh_amount, xrpInfo, "1", "2")
 
 
   // Disconnect when done -----------------------------------------------------

@@ -213,8 +213,13 @@ export const confirmAmm = async(
 
     console.log(`The AMM account ${lp_token.issuer} has ${lp_token.value} total
                 LP tokens outstanding, and uses the currency code ${lp_token.currency}.`)
-    console.log(`In its pool, the AMM holds ${amount.value} ${amount.currency}.${amount.issuer}
-                and ${amount2.value} ${amount2.currency}.${amount2.issuer}`)
+    if(amount2.currency != undefined) {
+      console.log(`In its pool, the AMM holds ${amount.value} ${amount.currency}.${amount.issuer}
+                   and ${amount2.value} ${amount2.currency}.${amount2.issuer}`)
+    } else {
+      console.log(`In its pool, the AMM holds ${amount.value} ${amount.currency}.${amount.issuer}
+                   and ${amount2} XRP`)
+    }
 
     // check balanse
     const account_lines_result = await client.request({
@@ -565,7 +570,7 @@ export const swap = async(
         "issuer": token1Info.issuer
       },
       "SendMax": {
-        "currency": token2Info.currency,  // ここで変換元のトークンの種類を指定する。
+        "currency": token2Info.currency,  // ここで変換先のトークンの種類を指定する。
         "value": token2Value,
         "issuer": token2Info.issuer
       },
@@ -597,14 +602,6 @@ export const swap = async(
       "Paths": [
         [
           {
-            "account": wallet.address,
-            "type": 1
-          },
-          {
-            "account": "XRP",
-            "type": 16
-          },
-          {
             "currency": token1Info.currency,
             "issuer": token1Info.issuer,
             "type": 48
@@ -618,7 +615,7 @@ export const swap = async(
     const pay_prepared = await client.autofill(swapTxData);
     // トランザクションに署名
     const pay_signed = wallet.sign(pay_prepared);
-    console.log(`Sending ${token1Info} ${token1Info.currency} to ${ammAddress}...`)
+    console.log(`Sending ${token1Info.value} ${token1Info.currency} to ${ammAddress}...`)
     // 署名済みトランザクションをブロードキャスト
     const pay_result = await client.submitAndWait(pay_signed.tx_blob);
 
