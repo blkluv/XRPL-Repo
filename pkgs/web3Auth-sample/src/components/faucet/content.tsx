@@ -13,7 +13,7 @@ import iconImage from "../../public/DCCEX.png";
 import { PageHeader } from "../common/pageHeader";
 import Spinner from '../common/spinner';
 
-type Currency = {
+export type Currency = {
   name: string;
   currency: number;
 }
