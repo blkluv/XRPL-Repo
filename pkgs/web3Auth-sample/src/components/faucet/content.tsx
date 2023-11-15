@@ -70,8 +70,8 @@ export const FaucetContent = () => {
                                 }}
                               >
                                 <DropdownTrigger className="cursor-pointer">
-                                  <div className="flex items-center gap-2">
-                                    <div className="flex flex-col gap-4">
+                                  <div className="items-center gap-2 bg-gray-700">
+                                    <div className="flex-col gap-4 bg-gray-700">
                                       <h3 className="text-xl font-medium m-0 text-default-900 -mb-4 whitespace-nowrap">
                                         {token.name}
                                       </h3>
@@ -79,6 +79,7 @@ export const FaucetContent = () => {
                                   </div>
                                 </DropdownTrigger>
                                 <DropdownMenu
+                                  className="bg-gray-900"
                                   onAction={(e) => {
                                     if (e === "0") {
                                       setToken({
@@ -95,7 +96,10 @@ export const FaucetContent = () => {
                                   }}
                                   aria-label="Avatar Actions"
                                 >
-                                  <DropdownSection title="tokens">
+                                  <DropdownSection 
+                                    title="tokens"
+                                    className="bg-gray-900"
+                                  >
                                     <DropdownItem
                                       key="0"
                                       classNames={{

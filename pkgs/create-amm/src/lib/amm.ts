@@ -521,7 +521,7 @@ export const swap = async(
   // path find
   var result; 
   
-  if(token2Info.currency != null) { 
+  if(token1Info.currency != null && token2Info.currency != null) { 
     result = await client.request({
       command: 'path_find',
       subcommand: 'create',
@@ -538,7 +538,7 @@ export const swap = async(
         "issuer": token1Info.issuer
       }
     });
-  } else {
+  } else if(token2Info.currency == null) {
     result = await client.request({
       command: 'path_find',
       subcommand: 'create',
@@ -553,13 +553,13 @@ export const swap = async(
         "issuer": token1Info.issuer
       }
     });
-  }
+  } 
 
   console.log("path find:", result)
 
   // Swap用のトランザクションデータを作成する
   var swapTxData;
-  if(token2Info.currency != null) { 
+  if(token1Info.currency != null && token2Info.currency != null) { 
     swapTxData = {
       "TransactionType": "Payment",
       "Account": wallet.address,
@@ -588,7 +588,7 @@ export const swap = async(
         ]
       ]
     }
-  } else {
+  } else if (token2Info.currency == null) { // XRP > その他のトークン
     swapTxData = {
       "TransactionType": "Payment",
       "Account": wallet.address,
@@ -609,13 +609,38 @@ export const swap = async(
         ]
       ]
     }
+  } else if (token1Info.currency == null) { // その他のトークン > XRP
+    swapTxData = {
+      "TransactionType": "Payment",
+      "Account": wallet.address,
+      "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
+      "Amount": token1Value,
+      "SendMax": {
+        "currency": token2Info.currency,        // ここで変換先トークンの種類を指定する。
+        "value": token2Value,                   // ここで変換先トークンの金額を指定する。
+        "issuer": token2Info.issuer
+      },
+      "Paths": [
+        [
+          {
+            "currency": "XRP",
+            "type": 16
+          }
+        ]
+      ]
+    }
   }
   
   try {
     const pay_prepared = await client.autofill(swapTxData);
     // トランザクションに署名
     const pay_signed = wallet.sign(pay_prepared);
-    console.log(`Sending ${token1Info.value} ${token1Info.currency} to ${ammAddress}...`)
+    
+    if (token1Info.currency != null) {
+      console.log(`Sending ${token1Info.value} ${token1Info.currency} to ${ammAddress}...`)
+    } else if(token2Info.currency == null) {
+      console.log(`Sending ${token2Info.value} ${token2Info.currency} to ${ammAddress}...`)
+    }
     // 署名済みトランザクションをブロードキャスト
     const pay_result = await client.submitAndWait(pay_signed.tx_blob);
 

@@ -117,7 +117,7 @@ async function main() {
   // create XRP Amount info
   const xrpInfo: TokenInfo = {
     "currency": null,
-    "value": "10",
+    "value": "10000000",
     "issuer": null
   }
 
@@ -138,8 +138,10 @@ async function main() {
   await depositAmm(client, wallet, msh_amount, "15", xrpInfo, "10")
   // withdraw AMM
   await withdrawAmm(client, wallet, msh_amount, "5", xrpInfo, "5")
-  // Swap (payment Transaction)
-  await swap(client, wallet, ammInfo2.issuer, msh_amount, xrpInfo, "1", "2")
+  // Swap (payment Transaction) XRP ->> MSH
+  await swap(client, wallet, ammInfo2.issuer, msh_amount, xrpInfo, "1", "2000000")
+  // Swap (payment Transaction) MSH ->> XRP
+  await swap(client, wallet, ammInfo2.issuer, xrpInfo, msh_amount, "2000", "1")
 
 
   // Disconnect when done -----------------------------------------------------

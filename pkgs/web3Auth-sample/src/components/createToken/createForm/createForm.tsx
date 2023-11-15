@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { XummContext } from '@/context/XummProvider';
+import { useContext, useState } from "react";
 import InputNumberBox from "../../common/inputBox/InputNumberBox";
 import styles from "./CreateForm.module.css";
 
@@ -8,6 +9,8 @@ import styles from "./CreateForm.module.css";
 export const CreateForm = () => {
   const [tokenName, setTokenName] = useState("");
   const [initAmount, setInitAmount] = useState("");
+  
+  const xumm = useContext(XummContext);
 
   return (
     <div className="flex items-center justify-center flex-col rounded-b-lg p-5 mx-auto">
@@ -18,20 +21,23 @@ export const CreateForm = () => {
       </div>
       <div className={styles.tabBody}>
         <InputNumberBox
-            leftHeader={"TokenName"}
-            right={""}
-            value={tokenName}
-            onChange={(e: any) => setTokenName(e.target.value)}
+          leftHeader={"TokenName"}
+          right={""}
+          value={tokenName}
+          onChange={(e: any) => setTokenName(e.target.value)}
         />
         <br/>
         <InputNumberBox
-            leftHeader={"Init Amount"}
-            right={""}
-            value={initAmount}
-            onChange={(e: any) => setInitAmount(e.target.value)}
+          leftHeader={"Init Amount"}
+          right={""}
+          value={initAmount}
+          onChange={(e: any) => setInitAmount(e.target.value)}
         />
         <div className={styles.bottomDiv}>
-          <div className={styles.btn} onClick={() => {}}>
+          <div 
+            className={styles.btn} 
+            onClick={async() => { await xumm.issueNewToken(tokenName, initAmount) }}
+          >
             Create
           </div>
         </div>
