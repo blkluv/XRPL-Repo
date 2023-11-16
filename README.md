@@ -241,3 +241,4 @@ pnpm sample-app-nft run start
 60. [TailwindCSS Component live preview](https://tailwindui.com/components/preview)
 61. [【Supabase】Build a User Management App with Next.js](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs?database-method=dashboard&language=ts#project-setup)
 62. [Use Supabase with Next.js](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs)
+63. [NextUi Dropdown](https://nextui.org/docs/components/dropdown)

@@ -3,8 +3,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownSection,
-  DropdownTrigger,
+  DropdownTrigger
 } from "@nextui-org/react";
 
 type Props = {
@@ -43,7 +42,7 @@ export default function InputDropBox({
             placeholder={"Plaese enter"}
           />
         </div>
-        <div className="flex items-center justify-center text-2xl font-bold">
+        <div className="flex items-center justify-center text-2xl font-bold mt-3">
           <Dropdown
             classNames={{
               base: "w-full min-w-[260px]",
@@ -60,45 +59,26 @@ export default function InputDropBox({
             </DropdownTrigger>
             <DropdownMenu
               className="bg-gray-900"
-              onAction={(e) => {
-                if (e == 0) {
-                  setToken({
-                    name: "XRP",
-                    currency: 0,
-                  });
-                }
-                if (e == 1) {
-                  setToken({
-                    name: "Test Token",
-                    currency: 1,
-                  });
+              onAction={(e: any) => {
+                if (e >= 0 && e < inputs.length) {
+                  const selectedToken = inputs[e];
+                  setToken(selectedToken);
                 }
               }}
               aria-label="Avatar Actions"
+              items={inputs}
             >
-              <DropdownSection 
-                title="tokens"
-                className="bg-gray-900"
-              >
+              {(item: any) => (
                 <DropdownItem
-                  key="0"
+                  key={item.currency}
                   classNames={{
                     base: "py-4",
                     title: "text-base font-semibold",
                   }}
                 >
-                  XRP
+                  {item.name}
                 </DropdownItem>
-                <DropdownItem
-                  key="1"
-                  classNames={{
-                    base: "py-4",
-                    title: "text-base font-semibold",
-                  }}
-                >
-                  Test Token
-                </DropdownItem>
-              </DropdownSection>
+              )}
             </DropdownMenu>
           </Dropdown>
         </div>
