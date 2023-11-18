@@ -29,6 +29,7 @@ export const PoolsContent = () => {
                   <PageHeader/>
                   <div className="h-full flex flex-col gap-2">
                     <div className="w-full bg-default-50 shadow-lg rounded-2xl p-6 text-center">
+                      <h2 className='justify-center text-center text-4xl'>Pool Info</h2>
                       <TableWrapper/>
                     </div>
                   </div>

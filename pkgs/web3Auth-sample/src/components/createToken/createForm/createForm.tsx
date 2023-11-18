@@ -15,8 +15,8 @@ export const CreateForm = () => {
   return (
     <div className="flex items-center justify-center flex-col rounded-b-lg p-5 mx-auto">
       <div className=" mx-auto mt-10 bg-gray-900 w-500 rounded-t-lg px-5">
-        <div className="text-center bg-gray-900 rounded-lg p-2 mt-10 cursor-pointer">
-          Create New CarbonFT Form
+        <div className="text-center bg-gray-900 text-white rounded-lg p-2 mt-10 cursor-pointer text-4xl">
+          Create New CarbonFT
         </div>
       </div>
       <div className={styles.tabBody}>

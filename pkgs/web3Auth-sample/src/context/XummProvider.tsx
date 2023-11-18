@@ -4,6 +4,7 @@ import { getEnv } from "@/utils/getEnv";
 import React, { createContext, useContext, useState } from 'react';
 import {
   AccountSetAsfFlags,
+  AccountSetTfFlags,
   Client,
   Wallet,
   dropsToXrp,
@@ -168,7 +169,7 @@ export const XummProvider = ({
       } = await xumm!.payload!.createAndSubscribe({
         "TransactionType": "AccountSet",
         "Account": address!,
-        "SetFlag": AccountSetAsfFlags.asfDefaultRipple
+        "SetFlag": AccountSetAsfFlags.asfRequireDest
       }, eventMessage => {
         if (Object.keys(eventMessage.data).indexOf('opened') > -1) {
           console.log("eventMessage:", eventMessage)
@@ -198,23 +199,32 @@ export const XummProvider = ({
       console.log(`URL: ${EXPLORER}/transactions/${payload!.txid}`)
 
       // Create trust line to issuer ----------------------------------------------
+      // get env
+      const { FAUCET_SEED } = await getEnv();
+      // Create a wallet using the seed
+      const wallet = await Wallet.fromSeed(FAUCET_SEED);
+
       const { 
         created: created2, 
         resolved: resolved2 
       } = await xumm!.payload!.createAndSubscribe({
         "TransactionType": "TrustSet",
-        "Account": address!,
+        "Account": wallet.address,
+        "Fee": "20000",
+        "SetFlag": AccountSetAsfFlags.asfDefaultRipple,
+        // Using tf flags, we can enable more flags in one transaction
+        "Flags": (AccountSetTfFlags.tfDisallowXRP | AccountSetTfFlags.tfRequireDestTag),
         "LimitAmount": {
           "currency": currency_code,
-          "issuer": address!,
-          "value": "10000000000" // Large limit, arbitrarily chosen
+          "issuer": wallet.address,
+          "value": "100000000000000000" // Large limit, arbitrarily chosen
         }
       }, eventMessage => {
         if (Object.keys(eventMessage.data).indexOf('opened') > -1) {
-          console.log("eventMessage:", eventMessage)
+          console.log("TrustSet eventMessage:", eventMessage)
         }
         if (Object.keys(eventMessage.data).indexOf('signed') > -1) {
-          console.log("eventMessage:", eventMessage)
+          console.log("TrustSet eventMessage:", eventMessage)
           return eventMessage
         }
       })
@@ -231,19 +241,19 @@ export const XummProvider = ({
         resolved: resolved3 
       } = await xumm!.payload!.createAndSubscribe({
         "TransactionType": "Payment",
-        "Account": address!,
+        "Account": wallet.address,
         "Amount": {
           "currency": currency_code,
           "value": issue_quantity,
-          "issuer": address!
+          "issuer": wallet.address
         },
-        "Destination": address!
+        "Destination": wallet.address
       }, eventMessage => {
         if (Object.keys(eventMessage.data).indexOf('opened') > -1) {
-          console.log("eventMessage:", eventMessage)
+          console.log("Payment eventMessage:", eventMessage)
         }
         if (Object.keys(eventMessage.data).indexOf('signed') > -1) {
-          console.log("eventMessage:", eventMessage)
+          console.log("Payment eventMessage:", eventMessage)
           return eventMessage
         }
       })

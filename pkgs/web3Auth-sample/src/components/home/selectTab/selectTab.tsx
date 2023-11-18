@@ -22,7 +22,7 @@ export const SelectTab = () => {
       <div className="flex justify-between mx-auto mt-10 bg-gray-900 w-500 rounded-t-lg px-5">
         <div
           className={
-            "flex items-center justify-center bg-gray-900 rounded-lg w-3/10 p-2 mt-10 cursor-pointer" +
+            "flex items-center justify-center bg-gray-900 rounded-lg w-3/10 p-2 mt-10 cursor-pointer text-white" +
             " " +
             (activeTab === "Swap" ? "bg-blue-500 hover:bg-blue-700 text-white flex items-center justify-center text-base w-24 h-10 rounded-md" : "")
           }
@@ -32,7 +32,7 @@ export const SelectTab = () => {
         </div>
         <div
           className={
-            "flex items-center justify-center bg-gray-900 rounded-lg w-3/10 p-2 mt-10 cursor-pointer" +
+            "flex items-center justify-center bg-gray-900 rounded-lg w-3/10 p-2 mt-10 cursor-pointer text-white" +
             " " +
             (activeTab === "Provide" ? "bg-blue-500 hover:bg-blue-700 text-white flex items-center justify-center text-base w-24 h-10 rounded-md" : "")
           }
@@ -42,7 +42,7 @@ export const SelectTab = () => {
         </div>
         <div
           className={
-            "flex items-center justify-center bg-gray-900 rounded-lg w-3/10 p-2 mt-10 cursor-pointer" +
+            "flex items-center justify-center bg-gray-900 rounded-lg w-3/10 p-2 mt-10 cursor-pointer text-white" +
             " " +
             (activeTab === "Withdraw" ? "bg-blue-500 hover:bg-blue-700 text-white flex items-center justify-center text-base w-24 h-10 rounded-md" : "")
           }

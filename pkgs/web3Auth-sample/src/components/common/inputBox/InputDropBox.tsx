@@ -51,7 +51,7 @@ export default function InputDropBox({
             <DropdownTrigger className="cursor-pointer">
               <div className="items-center m-2 gap-2 bg-gray-700">
                 <div className="flex-col m-2 gap-4 bg-gray-700">
-                  <h3 className="text-xl font-medium m-0 text-default-900 whitespace-nowrap">
+                  <h3 className="text-xl font-medium m-0 text-white whitespace-nowrap ">
                     {token.name}
                   </h3>
                 </div>
@@ -71,10 +71,7 @@ export default function InputDropBox({
               {(item: any) => (
                 <DropdownItem
                   key={item.currency}
-                  classNames={{
-                    base: "py-4",
-                    title: "text-base font-semibold",
-                  }}
+                  className="py-4 text-base font-semibold text-white"
                 >
                   {item.name}
                 </DropdownItem>

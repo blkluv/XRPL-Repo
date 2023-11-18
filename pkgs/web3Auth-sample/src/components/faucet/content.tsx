@@ -54,7 +54,7 @@ export const FaucetContent = () => {
                             src={iconImage}
                             alt="DECCEX"
                           />
-                          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white-900">
+                          <h2 className="mt-10 text-center text-4xl font-bold leading-9 tracking-tight text-white-900">
                             Faucet Page
                           </h2>
                         </div>
@@ -72,7 +72,7 @@ export const FaucetContent = () => {
                                 <DropdownTrigger className="cursor-pointer">
                                   <div className="items-center gap-2 bg-gray-700">
                                     <div className="flex-col gap-4 bg-gray-700">
-                                      <h3 className="text-xl font-medium m-0 text-default-900 -mb-4 whitespace-nowrap">
+                                      <h3 className="text-xl font-medium m-0 text-white -mb-4 whitespace-nowrap">
                                         {token.name}
                                       </h3>
                                     </div>
@@ -87,12 +87,6 @@ export const FaucetContent = () => {
                                         currency: 0,
                                       });
                                     }
-                                    if (e === "1") {
-                                      setToken({
-                                        name: "Test Token",
-                                        currency: 1,
-                                      });
-                                    }
                                   }}
                                   aria-label="Avatar Actions"
                                 >
@@ -102,21 +96,9 @@ export const FaucetContent = () => {
                                   >
                                     <DropdownItem
                                       key="0"
-                                      classNames={{
-                                        base: "py-4",
-                                        title: "text-base font-semibold",
-                                      }}
+                                      className="py-4 text-base font-semibold text-white"
                                     >
                                       XRP
-                                    </DropdownItem>
-                                    <DropdownItem
-                                      key="1"
-                                      classNames={{
-                                        base: "py-4",
-                                        title: "text-base font-semibold",
-                                      }}
-                                    >
-                                      Test Token
                                     </DropdownItem>
                                   </DropdownSection>
                                 </DropdownMenu>
