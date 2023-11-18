@@ -1,21 +1,25 @@
 import InputDropBox from "@/components/common/inputBox/InputDropBox";
-import { Currency } from "@/components/faucet/content";
-import { useState } from "react";
+import { TokenInfo, XummContext } from "@/context/XummProvider";
+import { useContext, useState } from "react";
 import { MdSwapVert } from "react-icons/md";
+import { xrpToDrops } from "xrpl";
 import styles from "./SelectTab.module.css";
 
 // testData 
-const testData: Currency[] = [
+const testData: TokenInfo[] = [
     {
-        name: "XRP",
-        currency: 0
+        id: 0,
+        currency: null,
+        value: "1000",
+        issuer: null
     },
     {
-        name: "FOO",
-        currency: 1
+        id: 1,
+        currency: "WWW",
+        value: "1000",
+        issuer: "rBgsqbfqwgX7M4PR1wM5jqiMpqLunpRkzT"
     }
 ]
-
 
 /**
  * Swap Component
@@ -25,8 +29,18 @@ export default function Swap() {
 
     const [amountIn, setAmountIn] = useState("");
     const [amountOut, setAmountOut] = useState("");
-    const [token0, setToken0] = useState<Currency>(testData[0]);
-    const [token1, setToken1] = useState<Currency>(testData[1]);
+    const [token0, setToken0] = useState<TokenInfo>(testData[0]);
+    const [token1, setToken1] = useState<TokenInfo>(testData[1]);
+
+    const xumm = useContext(XummContext);
+
+    /**
+     * swap処理を実行するメソッド
+     */
+    const swap = async() => {
+        // 今は値を固定で実施
+        await xumm.swap(token0, token1, xrpToDrops(0.0001), "1000000")
+    }
 
     return (
         <div className={styles.tabBody}>
@@ -52,7 +66,7 @@ export default function Swap() {
             <div className={styles.bottomDiv}>
                 <div 
                     className={styles.btn} 
-                    onClick={() => {}}
+                    onClick={swap}
                 >
                     Swap
                 </div>

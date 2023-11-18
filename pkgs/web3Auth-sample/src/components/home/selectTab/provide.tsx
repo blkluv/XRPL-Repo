@@ -1,18 +1,22 @@
 import InputDropBox from "@/components/common/inputBox/InputDropBox";
-import { Currency } from "@/components/faucet/content";
+import { TokenInfo } from "@/context/XummProvider";
 import { useState } from "react";
 import { MdAdd } from "react-icons/md";
 import styles from "./SelectTab.module.css";
 
 // testData 
-const testData: Currency[] = [
+const testData: TokenInfo[] = [
     {
-        name: "XRP",
-        currency: 0
+        id: 0,
+        currency: "XRP",
+        value: "1000",
+        issuer: ""
     },
     {
-        name: "FOO",
-        currency: 1
+        id: 1,
+        currency: "WWW",
+        value: "1000",
+        issuer: ""
     }
 ]
 
@@ -24,8 +28,8 @@ export default function Provide() {
 
     const [amountOfToken0, setAmountOfToken0] = useState<string>("");
     const [amountOfToken1, setAmountOfToken1] = useState<string>("");
-    const [token0, setToken0] = useState<Currency>(testData[0]);
-    const [token1, setToken1] = useState<Currency>(testData[1]);
+    const [token0, setToken0] = useState<TokenInfo>(testData[0]);
+    const [token1, setToken1] = useState<TokenInfo>(testData[1]);
     const [activePool, setActivePool] = useState(true);
 
     return (

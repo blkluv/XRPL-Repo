@@ -1,17 +1,21 @@
-import { Currency } from "@/components/faucet/content";
+import { TokenInfo } from "@/context/XummProvider";
 import { useState } from "react";
 import InputDropBox from "../../common/inputBox/InputDropBox";
 import styles from "./SelectTab.module.css";
 
 // testData 
-const testData: Currency[] = [
+const testData: TokenInfo[] = [
     {
-        name: "39i...9s",
-        currency: 0
+        id: 0,
+        currency: "XRP",
+        value: "1000",
+        issuer: ""
     },
     {
-        name: "w9i..665",
-        currency: 1
+        id: 1,
+        currency: "WWW",
+        value: "1000",
+        issuer: ""
     }
 ]
 
@@ -24,7 +28,7 @@ export default function Withdraw() {
     const [amountOfToken0, setAmountOfToken0] = useState("");
     const [amountOfToken1, setAmountOfToken1] = useState("");
     const [amountOfShare, setAmountOfShare] = useState("");
-    const [lpToken, setLpToken] = useState<Currency>(testData[0]);
+    const [lpToken, setLpToken] = useState<TokenInfo>(testData[0]);
     const [amountOfMaxShare, setAmountOfMaxShare] = useState<string>();
 
     return (

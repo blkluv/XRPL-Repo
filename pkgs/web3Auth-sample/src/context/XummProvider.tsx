@@ -4,16 +4,15 @@ import { getEnv } from "@/utils/getEnv";
 import React, { createContext, useContext, useState } from 'react';
 import {
   AccountSetAsfFlags,
-  AccountSetTfFlags,
   Client,
   Wallet,
   dropsToXrp,
-  getBalanceChanges,
   xrpToDrops
 } from 'xrpl';
 import { Xumm } from "xumm";
 
 export type TokenInfo = {
+  "id": number | null;
   "currency": string | null;
   "value": string;
   "issuer": string | null;
@@ -156,182 +155,148 @@ export const XummProvider = ({
   ) => {
     try {
       globalContext.setLoading(true)
-      // Get credentials from the Testnet Faucet -----------------------------------
-      console.log("Funding an issuer address with the faucet...")
-      console.log(`Got issuer address ${address}.`)
-    
-      // Enable issuer DefaultRipple ----------------------------------------------
-      const { 
-        created, 
-        resolve,
-        resolved, 
-        websocket 
-      } = await xumm!.payload!.createAndSubscribe({
-        "TransactionType": "AccountSet",
-        "Account": address!,
-        "SetFlag": AccountSetAsfFlags.asfRequireDest
-      }, eventMessage => {
-        if (Object.keys(eventMessage.data).indexOf('opened') > -1) {
-          console.log("eventMessage:", eventMessage)
-        }
-        if (Object.keys(eventMessage.data).indexOf('signed') > -1) {
-          console.log("eventMessage:", eventMessage)
-          return eventMessage
-        }
-      })
-      
-      console.log('Payload URL:', created.next.always)
-      console.log('Payload QR:', created.refs.qr_png)
-      
-      websocket.onmessage = (msg) => {
-        const data = JSON.parse(msg.data.toString());
-        // トランザクションへの署名が完了/拒否されたらresolve
-        if (typeof data.signed === "boolean") {
-          resolve({ 
-            signed: data.signed, 
-            txid: data.txid 
-          });
-        }
-      };
-
-      const payload: any = await resolved
-      console.log('Resolved', payload)
-      console.log(`URL: ${EXPLORER}/transactions/${payload!.txid}`)
-
+      // Connect to the client   
+      await client.connect();
       // Create trust line to issuer ----------------------------------------------
       // get env
       const { FAUCET_SEED } = await getEnv();
       // Create a wallet using the seed
       const wallet = await Wallet.fromSeed(FAUCET_SEED);
+      console.log(`Got faucet wallet address ${wallet.address}.`)
+      const issuer = (await client.fundWallet()).wallet
+      console.log(`Got issuer address ${issuer.address}.`)
 
-      const { 
-        created: created2, 
-        resolved: resolved2 
-      } = await xumm!.payload!.createAndSubscribe({
-        "TransactionType": "TrustSet",
-        "Account": wallet.address,
-        "Fee": "20000",
-        "SetFlag": AccountSetAsfFlags.asfDefaultRipple,
-        // Using tf flags, we can enable more flags in one transaction
-        "Flags": (AccountSetTfFlags.tfDisallowXRP | AccountSetTfFlags.tfRequireDestTag),
-        "LimitAmount": {
-          "currency": currency_code,
-          "issuer": wallet.address,
-          "value": "100000000000000000" // Large limit, arbitrarily chosen
-        }
-      }, eventMessage => {
-        if (Object.keys(eventMessage.data).indexOf('opened') > -1) {
-          console.log("TrustSet eventMessage:", eventMessage)
-        }
-        if (Object.keys(eventMessage.data).indexOf('signed') > -1) {
-          console.log("TrustSet eventMessage:", eventMessage)
-          return eventMessage
-        }
-      })
-      
-      console.log('Payload URL:', created2.next.always)
-      console.log('Payload QR:', created2.refs.qr_png)
-      
-      const payload2 = await resolved2
-      console.log('Resolved', payload2)
-        
-      // Issue tokens -------------------------------------------------------------
-      const { 
-        created: created3, 
-        resolved: resolved3 
-      } = await xumm!.payload!.createAndSubscribe({
-        "TransactionType": "Payment",
-        "Account": wallet.address,
-        "Amount": {
-          "currency": currency_code,
-          "value": issue_quantity,
-          "issuer": wallet.address
-        },
-        "Destination": wallet.address
-      }, eventMessage => {
-        if (Object.keys(eventMessage.data).indexOf('opened') > -1) {
-          console.log("Payment eventMessage:", eventMessage)
-        }
-        if (Object.keys(eventMessage.data).indexOf('signed') > -1) {
-          console.log("Payment eventMessage:", eventMessage)
-          return eventMessage
-        }
-      })
-      
-      console.log('Payload URL:', created3.next.always)
-      console.log('Payload QR:', created3.refs.qr_png)
-      
-      const payload3 = await resolved3
-      console.log('Resolved', payload3)
-    
-      const tokenInfo: TokenInfo = {
-        "currency": currency_code,
-        "value": issue_quantity,
-        "issuer": address!
+      // Enable issuer DefaultRipple ----------------------------------------------
+      const issuer_setup_result = await client.submitAndWait({
+        "TransactionType": "AccountSet",
+        "Account": issuer.address,
+        "SetFlag": AccountSetAsfFlags.asfDefaultRipple
+      }, {
+        autofill: true, 
+        wallet: issuer
+      } )
+
+      // get metaData & TransactionResult
+      const metaData: any = issuer_setup_result.result.meta!;
+      const transactionResult = metaData.TransactionResult;
+
+      if (transactionResult == "tesSUCCESS") {
+        console.log(`Issuer DefaultRipple enabled: ${EXPLORER}/transactions/${issuer_setup_result.result.hash}`)
+      } else {
+        throw `Error sending transaction: ${issuer_setup_result}`
       }
 
-      globalContext.setLoading(false);
-      return tokenInfo;
-    } catch(err) {
-      console.error("err:", err)
-      globalContext.setLoading(false);
-      return null;
-    }
-  }
-
-  /**
-   * トークンを取得するメソッド
-   * @param wallet 
-   * @param token 
-   */
-  const acquireTokens = async(
-    wallet: any,
-    token: TokenInfo,
-  ) => {
-    try {
-      globalContext.setLoading(true);
-      const offer_result = await client.submitAndWait({
-        "TransactionType": "OfferCreate",
+      // Create trust line to issuer ----------------------------------------------
+      const trust_result = await client.submitAndWait({
+        "TransactionType": "TrustSet",
         "Account": wallet.address,
-        "TakerPays": {
-          currency: token.currency!,
-          issuer: token.issuer!,
-          value: "1000"
-        },
-        "TakerGets": xrpToDrops(25*10*1.16)
+        "LimitAmount": {
+          "currency": currency_code,
+          "issuer": issuer.address,
+          "value": "100000000000000000" // Large limit, arbitrarily chosen
+        }
       }, {
         autofill: true, 
         wallet: wallet
       })
-  
+
       // get metaData & TransactionResult
-      const metaData: any = offer_result.result.meta!;
-      const transactionResult = metaData.TransactionResult;
-    
-      if (transactionResult == "tesSUCCESS") {
-        console.log(`MSH offer placed: ${EXPLORER}/transactions/${offer_result.result.hash}`)
-        const balance_changes = getBalanceChanges(metaData)
-    
-        for (const bc of balance_changes) {
-          if (bc.account != wallet.address) {continue}
-          for (const bal of bc.balances) {
-            if (bal.currency == "MSH") {
-              console.log(`Got ${bal.value} ${bal.currency}.${bal.issuer}.`)
-              break
-            }
-          }
-          break
-        }
-    
+      const metaData2: any = trust_result.result.meta!;
+      const transactionResult2 = metaData2.TransactionResult;
+
+      if (transactionResult2 == "tesSUCCESS") {
+        console.log(`Trust line created: ${EXPLORER}/transactions/${trust_result.result.hash}`)
       } else {
-        throw `Error sending transaction: ${offer_result}`
+        throw `Error sending transaction: ${trust_result}`
       }
-    } catch(err) {
-      console.error("Acquire tokens err: ", err)
-    } finally {
+
+      // Issue tokens -------------------------------------------------------------
+      const issue_result = await client.submitAndWait({
+        "TransactionType": "Payment",
+        "Account": issuer.address,
+        "Amount": {
+          "currency": currency_code,
+          "value": issue_quantity,
+          "issuer": issuer.address
+        },
+        "Destination": wallet.address
+      }, {
+        autofill: true, 
+        wallet: issuer
+      })
+
+       // get metaData & TransactionResult
+       const metaData3: any = issue_result.result.meta!;
+       const transactionResult3 = metaData3.TransactionResult;
+
+      if (transactionResult3 == "tesSUCCESS") {
+        console.log(`Tokens issued: ${EXPLORER}/transactions/${issue_result.result.hash}`)
+      } else {
+        throw `Error sending transaction: ${issue_result}`
+      }
+
+      const tokenInfo: TokenInfo = {
+        "id": null,
+        "currency": currency_code,
+        "value": issue_quantity,
+        "issuer": issuer.address
+      }
+
+      // AMM 作成コストを取得する
+      const amm_fee_drops = await getAmmcost();
+      // 発行した後にすぐにuserがSwapでトークンをゲットできるようにこのタイミングでXRPとのAMMを作成する。
+      const ammcreate_result = await client.submitAndWait({
+        "TransactionType": "AMMCreate",
+        "Account": wallet.address,
+        "Amount": {
+          currency: tokenInfo.currency!,
+          issuer: tokenInfo.issuer!,
+          value: issue_quantity
+        },
+        "Amount2": xrpToDrops(10), // 10 XRP
+        "TradingFee": 500, // 0.5%
+        "Fee": amm_fee_drops
+      }, {
+        autofill: true, 
+        wallet: wallet, 
+        failHard: true
+      })
+
+      // get metaData & TransactionResult
+      const metaData4: any = ammcreate_result.result.meta!;
+      const transactionResult4 = metaData4.TransactionResult;
+    
+      // Use fail_hard so you don't waste the tx cost if you mess up
+      if (transactionResult4 == "tesSUCCESS") {
+        console.log(`AMM created: ${EXPLORER}/transactions/${ammcreate_result.result.hash}`)
+        const amm_info_request: AmmInfo = {
+          "command": "amm_info",
+          "asset": {
+            "currency": tokenInfo.currency!,
+            "issuer": tokenInfo.issuer!,
+          },
+          "asset2": {
+            "currency": "XRP",
+            "issuer": null
+          },
+          "ledger_index": "validated"
+        }
+        // confirm AMM Info
+        await confirmAmm(amm_info_request)
+      } else {
+        throw `Error sending transaction: ${JSON.stringify(ammcreate_result)}`
+      }
+
       globalContext.setLoading(false);
+      await client.disconnect();
+      return tokenInfo;
+    } catch(err) {
+      console.error("err:", err)
+      globalContext.setLoading(false);
+      await client.disconnect();
+      return null;
     }
-  };
+  }
 
   /**
    * AMMのペアを新しく生成するメソッド
@@ -345,6 +310,7 @@ export const XummProvider = ({
     try {
       globalContext.setLoading(true);
       var ammcreate_result;
+
       if(token2Info.currency != null) {
         ammcreate_result = await client.submitAndWait({
           "TransactionType": "AMMCreate",
@@ -392,6 +358,39 @@ export const XummProvider = ({
       // Use fail_hard so you don't waste the tx cost if you mess up
       if (transactionResult == "tesSUCCESS") {
         console.log(`AMM created: ${EXPLORER}/transactions/${ammcreate_result.result.hash}`)
+        console.log(`Created AMM Info: ${metaData}`)
+
+        var amm_info_request: AmmInfo;
+        // create AMM Info (another XRP pattern)
+        if(token2Info.currency != null) {
+          amm_info_request = {
+            "command": "amm_info",
+            "asset": {
+              "currency": token1Info.currency!,
+              "issuer": token1Info.issuer!,
+            },
+            "asset2": {
+              "currency": token2Info.currency!,
+              "issuer": token2Info.issuer!,
+            },
+            "ledger_index": "validated"
+          }
+        } else {
+          amm_info_request = {
+            "command": "amm_info",
+            "asset": {
+              "currency": token1Info.currency!,
+              "issuer": token1Info.issuer!,
+            },
+            "asset2": {
+              "currency": "XRP",
+              "issuer": null
+            },
+            "ledger_index": "validated"
+          }
+        }
+        // confirm AMM Info
+        await confirmAmm(amm_info_request)
       } else {
         throw `Error sending transaction: ${JSON.stringify(ammcreate_result)}`
       }
@@ -449,7 +448,6 @@ export const XummProvider = ({
    * AMMの情報を取得するメソッド
    */
   const confirmAmm = async(
-    wallet: any,
     amm_info_request: AmmInfo
   ): Promise<any> => {
     try {
@@ -459,12 +457,15 @@ export const XummProvider = ({
       console.log("amm_info_result2:", amm_info_result2)
   
       const results = amm_info_result2.result as any;
+
+      console.log("amm_info_result2:", results.amm)
   
       const lp_token = results.amm.lp_token
       const amount = results.amm.amount
       const amount2 = results.amm.amount2
   
       const ammInfo: TokenInfo = {
+        "id": null,
         "currency": lp_token.currency,
         "issuer": lp_token.issuer,
         "value": "0"
@@ -480,18 +481,8 @@ export const XummProvider = ({
                      and ${amount2} XRP`)
       }
   
-      // check balanse
-      const account_lines_result = await client.request({
-        "command": "account_lines",
-        "account": wallet.address,
-        // Tip: To look up only the new AMM's LP Tokens, uncomment:
-        // "peer": lp_token.issuer,
-        "ledger_index": "validated"
-      })
-
       globalContext.setLoading(false);
       return {
-        account_lines_result,
         ammInfo
       };
     } catch(err) {
@@ -611,7 +602,6 @@ export const XummProvider = ({
    * AMM Withdraw メソッド
    */
   const withdrawAmm = async(
-    wallet: any,
     token1Info: TokenInfo,
     token1Amount: string,
     token2Info: TokenInfo,
@@ -619,40 +609,59 @@ export const XummProvider = ({
   ) => {
     try {
       globalContext.setLoading(true);
-      var result;
       if(token1Info.currency != null && token2Info.currency != null) { 
-        result = await client.submitAndWait({
-          "TransactionType": "AMMWithdraw",
-          "Account": wallet.address,
-          "Amount": {
-            "currency": token1Info.currency,
-            "issuer": token1Info.issuer!,
-            "value": token1Amount
-          },
-          "Amount2": {
-            "currency": token2Info.currency,
-            "issuer": token2Info.issuer!,
-            "value": token2Amount
-          },
-          "Asset": {
-            "currency": token1Info.currency,
-            "issuer": token1Info.issuer!,
-          },
-          "Asset2": {
-            "currency": token2Info.currency,
-            "issuer": token2Info.issuer!,
-          },
-          "Fee" : "10",
-          "Flags" : 1048576,
-        }, {
-          autofill: true, 
-          wallet: wallet, 
-          failHard: true
-        })
+        const { 
+          created, 
+          resolve, 
+          resolved, 
+          websocket 
+        } = await xumm!.payload!.createAndSubscribe({
+            "TransactionType": "AMMWithdraw",
+            "Account": address,
+            "Amount": {
+              "currency": token1Info.currency,
+              "issuer": token1Info.issuer!,
+              "value": token1Amount
+            },
+            "Amount2": {
+              "currency": token2Info.currency,
+              "issuer": token2Info.issuer!,
+              "value": token2Amount
+            },
+            "Asset": {
+              "currency": token1Info.currency,
+              "issuer": token1Info.issuer!,
+            },
+            "Asset2": {
+              "currency": token2Info.currency,
+              "issuer": token2Info.issuer!,
+            },
+            "Fee" : "10",
+            "Flags" : 1048576,
+          })
+
+        console.log("Payload URL:", created.next.always);
+        console.log("Payload QR:", created.refs.qr_png);
+        
+        websocket.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
       } else if(token2Info.currency == null) {
-        result = await client.submitAndWait({
+        const { 
+          created, 
+          resolve, 
+          resolved, 
+          websocket 
+        } = await xumm!.payload!.createAndSubscribe({
           "TransactionType": "AMMWithdraw",
-          "Account": wallet.address,
+          "Account": address!,
           "Amount": {
             "currency": token1Info.currency!,
             "issuer": token1Info.issuer!,
@@ -668,15 +677,30 @@ export const XummProvider = ({
           },
           "Fee" : "10",
           "Flags" : 1048576,
-        }, {
-          autofill: true, 
-          wallet: wallet, 
-          failHard: true
         })
+        
+        console.log("Payload URL:", created.next.always);
+        console.log("Payload QR:", created.refs.qr_png);
+        
+        websocket.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
       } else if(token1Info.currency == null) {
-        result = await client.submitAndWait({
+        const { 
+          created, 
+          resolve, 
+          resolved, 
+          websocket 
+        } = await xumm!.payload!.createAndSubscribe({
           "TransactionType": "AMMWithdraw",
-          "Account": wallet.address,
+          "Account": address!,
           "Amount": token1Amount,
           "Amount2": {
             "currency": token2Info.currency,
@@ -691,22 +715,21 @@ export const XummProvider = ({
             "issuer": token1Info.issuer!,
           },
           "Flags" : 1048576,
-        }, {
-          autofill: true, 
-          wallet: wallet, 
-          failHard: true
         })
-      }
-  
-      // get metaData & TransactionResult
-      const metaData: any = result!.result.meta!;
-      const transactionResult = metaData.TransactionResult;
-    
-      // Use fail_hard so you don't waste the tx cost if you mess up
-      if (transactionResult == "tesSUCCESS") {
-        console.log(`AMM withdraw: ${EXPLORER}/transactions/${result!.result.hash}`)
-      } else {
-        throw `Error sending transaction: ${JSON.stringify(result)}`
+
+        console.log("Payload URL:", created.next.always);
+        console.log("Payload QR:", created.refs.qr_png);
+        
+        websocket.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
       }
     } catch(err) {
       console.error("error occuered while withdrawAmm:", err)
@@ -716,109 +739,15 @@ export const XummProvider = ({
   };
 
   /**
-   * AMMのオークションスロットに入札するためのメソッド
-   */
-  const bidAmm = async(
-    wallet: any,
-    token1Info: TokenInfo,
-    token2Info: TokenInfo,
-    ammInfo: TokenInfo
-  ) => {
-    try {
-      globalContext.setLoading(true);
-      const result = await client.submitAndWait({
-        "TransactionType": "AMMBid",
-        "Account": wallet.address,
-        "Asset": {
-          currency: token1Info.currency!,
-          issuer: token1Info.issuer!,
-        },
-        "Asset2": {
-          "currency": token2Info.currency!,
-          "issuer": token2Info.issuer!,
-        },
-        "BidMax" : {
-          "currency" : ammInfo.currency!,
-          "issuer" : ammInfo.issuer!,
-          "value" : "5"
-        },
-      }, {
-        autofill: true, 
-        wallet: wallet, 
-        failHard: true
-      })
-  
-      // get metaData & TransactionResult
-      const metaData: any = result.result.meta!;
-      const transactionResult = metaData.TransactionResult;
-    
-      // Use fail_hard so you don't waste the tx cost if you mess up
-      if (transactionResult == "tesSUCCESS") {
-        console.log(`AMM bid: ${EXPLORER}/transactions/${result.result.hash}`)
-      } else {
-        throw `Error sending transaction: ${JSON.stringify(result)}`
-      }
-    } catch(err) {
-      console.error("error occuered while bidAmm:", err)
-    }
-  }
-
-  /**
-   * AMMの取引手数料に投票するためのメソッド
-   */
-  const voteAmm = async(
-    wallet: any,
-    token1Info: TokenInfo,
-    token2Info: TokenInfo,
-    tradingFee: number
-  ) => {
-    try {
-      const result = await client.submitAndWait({
-        "TransactionType": "AMMVote",
-        "Account": wallet.address,
-        "Asset": {
-          currency: token1Info.currency!,
-          issuer: token1Info.issuer!,
-        },
-        "Asset2": {
-          "currency": token2Info.currency!,
-          "issuer": token2Info.issuer!,
-        },
-        "TradingFee" : tradingFee,
-      }, {
-        autofill: true, 
-        wallet: wallet, 
-        failHard: true
-      })
-  
-      // get metaData & TransactionResult
-      const metaData: any = result.result.meta!;
-      const transactionResult = metaData.TransactionResult;
-    
-      // Use fail_hard so you don't waste the tx cost if you mess up
-      if (transactionResult == "tesSUCCESS") {
-        console.log(`AMM vote: ${EXPLORER}/transactions/${result.result.hash}`)
-      } else {
-        throw `Error sending transaction: ${JSON.stringify(result)}`
-      }
-    } catch(err) {
-      console.error("error occuered while voteAmm:", err)
-    } finally {
-      globalContext.setLoading(false);
-    }
-  };
-
-  /**
    * Swap
    */
   const swap = async(
-    wallet: any,
-    ammAddress: string,
     token1Info: TokenInfo,
     token2Info: TokenInfo,
     token1Value: string,
     token2Value: string
   ) => {
+    // PATH情報を見つけたらコンソールに出力させる。(確認用)
     client.on('path_find', (stream: any) => {
       console.log(JSON.stringify(stream.alternatives, null, '  '))
     })
@@ -826,18 +755,21 @@ export const XummProvider = ({
     var result; 
     
     try {
+      // Connect to the client   
+      await client.connect();
       globalContext.setLoading(true);
+    
       if(token1Info.currency != null && token2Info.currency != null) { 
         result = await client.request({
           command: 'path_find',
           subcommand: 'create',
-          source_account: wallet.address,
+          source_account: address,
           source_amount: {
             "currency": token2Info.currency,  
             "value": token2Value,                   
             "issuer": token2Info.issuer
           },
-          destination_account: wallet.address,
+          destination_account: address,
           destination_amount: {
             "currency": token1Info.currency,  
             "value": token1Value,                   
@@ -848,11 +780,11 @@ export const XummProvider = ({
         result = await client.request({
           command: 'path_find',
           subcommand: 'create',
-          source_account: wallet.address,
+          source_account: address,
           source_amount: {
             "currency": "XRP",
           },
-          destination_account: wallet.address,
+          destination_account: address,
           destination_amount: {
             "currency": token1Info.currency,  
             "value": token1Value,                   
@@ -869,8 +801,9 @@ export const XummProvider = ({
       if(token1Info.currency != null && token2Info.currency != null) { 
         swapTxData = {
           "TransactionType": "Payment",
-          "Account": wallet.address,
-          "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
+          "Account": address,
+          "Destination": address,      // AMMの際は自分自身のアドレスを指定
+          "DestinationTag": 1,
           "Amount": {
             "currency": token1Info.currency,        // ここで変換先トークンの種類を指定する。
             "value": token1Value,                   // ここで変換先トークンの金額を指定する。
@@ -898,8 +831,9 @@ export const XummProvider = ({
       } else if (token2Info.currency == null) { // XRP > その他のトークン
         swapTxData = {
           "TransactionType": "Payment",
-          "Account": wallet.address,
-          "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
+          "Account": address,
+          "Destination": address,      // AMMの際は自分自身のアドレスを指定
+          "DestinationTag": 1,
           "Amount": {
             "currency": token1Info.currency,        // ここで変換先トークンの種類を指定する。
             "value": token1Value,                   // ここで変換先トークンの金額を指定する。
@@ -919,8 +853,9 @@ export const XummProvider = ({
       } else if (token1Info.currency == null) { // その他のトークン > XRP
         swapTxData = {
           "TransactionType": "Payment",
-          "Account": wallet.address,
-          "Destination": wallet.address,      // AMMの際は自分自身のアドレスを指定
+          "Account": address,
+          "Destination": address,      // AMMの際は自分自身のアドレスを指定
+          "DestinationTag": 1,
           "Amount": token1Value,
           "SendMax": {
             "currency": token2Info.currency,        // ここで変換先トークンの種類を指定する。
@@ -938,37 +873,42 @@ export const XummProvider = ({
         }
       }
 
-      const pay_prepared = await client.autofill(swapTxData);
-      // トランザクションに署名
-      const pay_signed = wallet.sign(pay_prepared);
+      // Swap用のトランザクションを実行
+      const { 
+        created, 
+        resolve, 
+        resolved, 
+        websocket 
+      } = await xumm!.payload!.createAndSubscribe(swapTxData)
+
+      console.log("Payload URL:", created.next.always);
+      console.log("Payload QR:", created.refs.qr_png);
       
-      if (token1Info.currency != null) {
-        console.log(`Sending ${token1Info.value} ${token1Info.currency} to ${ammAddress}...`)
-      } else if(token2Info.currency == null) {
-        console.log(`Sending ${token2Info.value} ${token2Info.currency} to ${ammAddress}...`)
-      }
-      // 署名済みトランザクションをブロードキャスト
-      const pay_result = await client.submitAndWait(pay_signed.tx_blob);
-  
-      if (pay_result.result.meta.TransactionResult == "tesSUCCESS") {
-        console.log(`Transaction succeeded: ${EXPLORER}/transactions/${pay_signed.hash}`)
-      } else {
-        throw `Error sending transaction: ${pay_result.result.meta.TransactionResult}`
+      websocket.onmessage = (msg) => {
+        const data = JSON.parse(msg.data.toString());
+        // トランザクションへの署名が完了/拒否されたらresolve
+        if (typeof data.signed === "boolean") {
+          resolve({
+            signed: data.signed,
+            txid: data.txid,
+          });
+        }
       };
-  
+      
       // Check balances ------------------------------------------------------------
       console.log("Getting hot address balances...");
       // get hot address data
       const balances = await client.request({
         command: "account_lines",
-        account: wallet.address,
+        account: address,
         ledger_index: "validated"
       })
-      console.log("wallet address's balance:", balances.result);
+      console.log("address's balance Info:", balances.result);
     } catch(err) {
       console.error("error occuered while swaping:", err);
     } finally {
       globalContext.setLoading(false);
+      await client.disconnect();
     }
   };
 
@@ -980,13 +920,10 @@ export const XummProvider = ({
     login,
     sendFaucet,
     issueNewToken,
-    acquireTokens,
     createAmm,
     getAmmcost,
     checkExistsAmm,
     confirmAmm,
-    bidAmm,
-    voteAmm,
     depositAmm,
     withdrawAmm,
     swap

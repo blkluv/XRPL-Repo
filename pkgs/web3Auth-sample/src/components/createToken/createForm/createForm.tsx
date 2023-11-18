@@ -12,6 +12,15 @@ export const CreateForm = () => {
   
   const xumm = useContext(XummContext);
 
+  /**
+   * issueNewToken method
+   */
+  const issueNetToken = async() => {
+    // issueNewTokenメソッドを呼び出す
+    await xumm.issueNewToken(tokenName, initAmount) 
+    // TODO insert to DB
+  }
+
   return (
     <div className="flex items-center justify-center flex-col rounded-b-lg p-5 mx-auto">
       <div className=" mx-auto mt-10 bg-gray-900 w-500 rounded-t-lg px-5">
@@ -36,7 +45,7 @@ export const CreateForm = () => {
         <div className={styles.bottomDiv}>
           <div 
             className={styles.btn} 
-            onClick={async() => { await xumm.issueNewToken(tokenName, initAmount) }}
+            onClick={issueNetToken}
           >
             Create
           </div>

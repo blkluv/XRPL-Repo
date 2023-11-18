@@ -1,4 +1,4 @@
-import { Currency } from "@/components/faucet/content";
+import { TokenInfo } from "@/context/XummProvider";
 import {
   Dropdown,
   DropdownItem,
@@ -8,11 +8,11 @@ import {
 
 type Props = {
   leftHeader: string;
-  inputs: Currency[];
+  inputs: TokenInfo[];
   value: string;
-  token: Currency;
+  token: TokenInfo;
   onChange: React.Dispatch<React.SetStateAction<string>>;
-  setToken: React.Dispatch<React.SetStateAction<Currency>>;
+  setToken: React.Dispatch<React.SetStateAction<TokenInfo>>;
 };
 
 /**
@@ -52,7 +52,7 @@ export default function InputDropBox({
               <div className="items-center m-2 gap-2 bg-gray-700">
                 <div className="flex-col m-2 gap-4 bg-gray-700">
                   <h3 className="text-xl font-medium m-0 text-white whitespace-nowrap ">
-                    {token.name}
+                    {token.currency == null ? "XRP" : token.currency}
                   </h3>
                 </div>
               </div>
@@ -70,10 +70,10 @@ export default function InputDropBox({
             >
               {(item: any) => (
                 <DropdownItem
-                  key={item.currency}
+                  key={item.id}
                   className="py-4 text-base font-semibold text-white"
                 >
-                  {item.name}
+                  {item.currency == null ? "XRP" : item.currency}
                 </DropdownItem>
               )}
             </DropdownMenu>

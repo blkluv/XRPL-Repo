@@ -18,6 +18,8 @@ export const RenderCell = ({
   // @ts-ignore
   const cellValue = lpToken[columnKey];
 
+  // todo get LP Token info by XRPL API
+
   switch (columnKey) {
     case "lpToken":
       return (

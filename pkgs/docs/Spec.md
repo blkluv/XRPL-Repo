@@ -22,29 +22,27 @@
 
 ## DB で管理が必要なデータ
 
-- 流動性
+- poolInfos
 
   - id
   - token1 の currency
   - token1 の issuer
-  - token1 の balance
   - token2 の currency
   - token2 の issuer
-  - token2 の balance
   - LP トークンの currencyCode
-  - LP トークンの残高
 
-- CarbonCresits
+- CarbonFts
   - id
   - token の currency
   - token の issuer
   - token の 発行量
+  - token の 発行日時
 
 ## 想定ページ
 
 - Main ページ
 
-  FT 同士の交換および AMM Deposit、AMM Withdraw、Faucet を行える機能。
+  FT 同士の交換および AMM Deposit、AMM Withdraw、CarbonFT の購入が行える機能。
 
 - CreateToken ページ
 
@@ -54,6 +52,8 @@
 
   カーボンクレジット FT の状況を確認・管理するためのページ  
   ※ issuer であれば発行および凍結ができるようにする。
+
+- Faucet ページ
 
 ## Why XRPL??
 
