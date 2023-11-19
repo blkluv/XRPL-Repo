@@ -244,3 +244,6 @@ pnpm sample-app-nft run start
 63. [NextUi Dropdown](https://nextui.org/docs/components/dropdown)
 64. [tem-code 一覧](https://xrpl.org/tem-codes.html)
 65. [Currency Code に関する命名規則](https://xrpl.org/currency-formats.html#currency-codes)
+66. [XRPL エラーコード tecPATH_DRY](https://xrpl.org/tec-codes.html#tecPATH_DRY)
+67. [XRPL トラストラインの定義](https://xrpl.org/ja/trust-lines-and-issuing.html#:~:text=%E3%83%88%E3%83%A9%E3%82%B9%E3%83%88%E3%83%A9%E3%82%A4%E3%83%B3%E3%81%A8%E3%81%AF%E3%80%81XRP,%E3%82%92%E5%BC%B7%E5%88%B6%E3%81%99%E3%82%8B%E3%82%82%E3%81%AE%E3%81%A7%E3%81%99%E3%80%82)
+68. [XRPL トラストライン](https://xrpl.org/ja/trustset.html)

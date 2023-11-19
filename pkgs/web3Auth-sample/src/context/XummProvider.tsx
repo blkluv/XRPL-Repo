@@ -747,10 +747,6 @@ export const XummProvider = ({
     token1Value: string,
     token2Value: string
   ) => {
-    // PATH情報を見つけたらコンソールに出力させる。(確認用)
-    client.on('path_find', (stream: any) => {
-      console.log(JSON.stringify(stream.alternatives, null, '  '))
-    })
     // path find
     var result; 
     
@@ -794,7 +790,43 @@ export const XummProvider = ({
       } 
     
       console.log("path find:", result)
-    
+
+      // get env
+      const { FAUCET_SEED } = await getEnv();
+      // Create a wallet using the seed
+      const wallet = await Wallet.fromSeed(FAUCET_SEED);
+      // Create trust line (token1 & token2) to user ----------------------------------------------
+      if(token1Info.currency != null) {
+        const trust_result1 = await client.submitAndWait({
+          "TransactionType": "TrustSet",
+          "Account": wallet.address,
+          "LimitAmount": {
+            "currency": token1Info.currency,
+            "issuer": token1Info.issuer!,
+            "value": "100000000000000000000000000" // Large limit, arbitrarily chosen
+          }
+        }, {
+          autofill: true, 
+          wallet: wallet
+        })
+        console.log("trust_result1:", trust_result1)
+      }
+      if(token2Info.currency != null) {
+        const trust_result2 = await client.submitAndWait({
+          "TransactionType": "TrustSet",
+          "Account": wallet.address,
+          "LimitAmount": {
+            "currency": token2Info.currency,
+            "issuer": token2Info.issuer!,
+            "value": "100000000000000000000000000" // Large limit, arbitrarily chosen
+          }
+        }, {
+          autofill: true, 
+          wallet: wallet
+        })
+        console.log("trust_result2:", trust_result2)
+      }
+      
       // Swap用のトランザクションデータを作成する
       var swapTxData: any;
 
@@ -894,6 +926,9 @@ export const XummProvider = ({
           });
         }
       };
+
+      // resolveされるまで待機
+      await resolved;
       
       // Check balances ------------------------------------------------------------
       console.log("Getting hot address balances...");

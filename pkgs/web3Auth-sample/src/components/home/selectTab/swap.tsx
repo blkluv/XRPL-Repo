@@ -39,7 +39,7 @@ export default function Swap() {
      */
     const swap = async() => {
         // 今は値を固定で実施
-        await xumm.swap(token0, token1, xrpToDrops(0.0001), "1000000")
+        await xumm.swap(token1, token0, "1000", xrpToDrops(5))
     }
 
     return (
