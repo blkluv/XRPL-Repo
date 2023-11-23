@@ -15,9 +15,9 @@ const testData: TokenInfo[] = [
     },
     {
         id: 1,
-        currency: "WWW",
+        currency: "rer",
         value: "1000",
-        issuer: "rBgsqbfqwgX7M4PR1wM5jqiMpqLunpRkzT"
+        issuer: "rwRE2wE6YmMBqTVhf739KohrreCn3kNy6x"
     }
 ]
 

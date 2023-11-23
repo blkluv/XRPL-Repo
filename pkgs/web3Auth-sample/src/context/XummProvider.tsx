@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState } from 'react';
 import {
   AccountSetAsfFlags,
   Client,
+  TrustSetFlags,
   Wallet,
   dropsToXrp,
   xrpToDrops
@@ -189,7 +190,8 @@ export const XummProvider = ({
       // Create trust line to issuer ----------------------------------------------
       const trust_result = await client.submitAndWait({
         "TransactionType": "TrustSet",
-        "Account": wallet.address,
+        "Account": wallet.address,              // トラストラインに設定したいアカウントを指定する。
+        "Flags": TrustSetFlags.tfClearNoRipple, // 発行者アカウントでRipplingをオンにする。
         "LimitAmount": {
           "currency": currency_code,
           "issuer": issuer.address,
@@ -796,12 +798,12 @@ export const XummProvider = ({
       // Create a wallet using the seed
       const wallet = await Wallet.fromSeed(FAUCET_SEED);
       // Create trust line (token1 & token2) to user ----------------------------------------------
-      if(token1Info.currency != null) {
+      if(token1Info.issuer != null) {
         const trust_result1 = await client.submitAndWait({
           "TransactionType": "TrustSet",
-          "Account": wallet.address,
+          "Account": address!,
           "LimitAmount": {
-            "currency": token1Info.currency,
+            "currency": token1Info.currency!,
             "issuer": token1Info.issuer!,
             "value": "100000000000000000000000000" // Large limit, arbitrarily chosen
           }
@@ -811,12 +813,13 @@ export const XummProvider = ({
         })
         console.log("trust_result1:", trust_result1)
       }
-      if(token2Info.currency != null) {
+      if(token2Info.issuer != null) {
         const trust_result2 = await client.submitAndWait({
           "TransactionType": "TrustSet",
-          "Account": wallet.address,
+          "Account": address!,
+          "Flags": TrustSetFlags.tfClearNoRipple, 
           "LimitAmount": {
-            "currency": token2Info.currency,
+            "currency": token2Info.currency!,
             "issuer": token2Info.issuer!,
             "value": "100000000000000000000000000" // Large limit, arbitrarily chosen
           }

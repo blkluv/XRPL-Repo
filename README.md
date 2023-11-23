@@ -247,3 +247,5 @@ pnpm sample-app-nft run start
 66. [XRPL エラーコード tecPATH_DRY](https://xrpl.org/tec-codes.html#tecPATH_DRY)
 67. [XRPL トラストラインの定義](https://xrpl.org/ja/trust-lines-and-issuing.html#:~:text=%E3%83%88%E3%83%A9%E3%82%B9%E3%83%88%E3%83%A9%E3%82%A4%E3%83%B3%E3%81%A8%E3%81%AF%E3%80%81XRP,%E3%82%92%E5%BC%B7%E5%88%B6%E3%81%99%E3%82%8B%E3%82%82%E3%81%AE%E3%81%A7%E3%81%99%E3%80%82)
 68. [XRPL トラストライン](https://xrpl.org/ja/trustset.html)
+69. [Rippling](https://xrpl.org/ja/rippling.html)
+70. [XRP Ledger で独自トークンを作成してみよう](https://zenn.dev/tequ/articles/issue-xrpl-token)
