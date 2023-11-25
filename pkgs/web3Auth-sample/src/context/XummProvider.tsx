@@ -4,6 +4,7 @@ import { getEnv } from "@/utils/getEnv";
 import React, { createContext, useContext, useState } from 'react';
 import {
   AccountSetAsfFlags,
+  AccountSetTfFlags,
   Client,
   TrustSetFlags,
   Wallet,
@@ -164,14 +165,15 @@ export const XummProvider = ({
       // Create a wallet using the seed
       const wallet = await Wallet.fromSeed(FAUCET_SEED);
       console.log(`Got faucet wallet address ${wallet.address}.`)
-      const issuer = (await client.fundWallet()).wallet
+      const issuer = (await client.fundWallet(wallet)).wallet
       console.log(`Got issuer address ${issuer.address}.`)
 
       // Enable issuer DefaultRipple ----------------------------------------------
       const issuer_setup_result = await client.submitAndWait({
         "TransactionType": "AccountSet",
         "Account": issuer.address,
-        "SetFlag": AccountSetAsfFlags.asfDefaultRipple
+        "SetFlag": AccountSetAsfFlags.asfDefaultRipple,
+        "Flags": (AccountSetTfFlags.tfDisallowXRP | AccountSetTfFlags.tfRequireDestTag)
       }, {
         autofill: true, 
         wallet: issuer
@@ -797,24 +799,80 @@ export const XummProvider = ({
       const { FAUCET_SEED } = await getEnv();
       // Create a wallet using the seed
       const wallet = await Wallet.fromSeed(FAUCET_SEED);
+
+      // AccountSet Tx ------------------------------------------
+      const { 
+        created: create2, 
+        resolve : resolve2, 
+        resolved: resolved2, 
+        websocket: websocket2 
+      } = await xumm!.payload!.createAndSubscribe({
+        "TransactionType": "AccountSet",
+        "Account": address!,
+        "Domain": "6578616D706C656D617368686172756B692E636F6D", 
+        "SetFlag": AccountSetAsfFlags.asfDefaultRipple,
+        "Flags": (AccountSetTfFlags.tfDisallowXRP | AccountSetTfFlags.tfRequireDestTag)
+      })
+
+      console.log("AccountSet Payload URL:", create2.next.always);
+      console.log("AccountSet Payload QR:", create2.refs.qr_png);
+      
+      websocket2.onmessage = (msg) => {
+        const data = JSON.parse(msg.data.toString());
+        // トランザクションへの署名が完了/拒否されたらresolve
+        if (typeof data.signed === "boolean") {
+          resolve2({
+            signed: data.signed,
+            txid: data.txid,
+          });
+        }
+      };
+
+      // resolveされるまで待機
+      await resolved2;
+      
       // Create trust line (token1 & token2) to user ----------------------------------------------
       if(token1Info.issuer != null) {
-        const trust_result1 = await client.submitAndWait({
+        const { 
+          created: create3, 
+          resolve : resolve3, 
+          resolved: resolved3, 
+          websocket: websocket3 
+        } = await xumm!.payload!.createAndSubscribe({
           "TransactionType": "TrustSet",
           "Account": address!,
+          "Flags": TrustSetFlags.tfClearNoRipple, 
           "LimitAmount": {
             "currency": token1Info.currency!,
             "issuer": token1Info.issuer!,
             "value": "100000000000000000000000000" // Large limit, arbitrarily chosen
           }
-        }, {
-          autofill: true, 
-          wallet: wallet
         })
-        console.log("trust_result1:", trust_result1)
+  
+        console.log("TrustSet Payload URL:", create3.next.always);
+        console.log("TrustSet Payload QR:", create3.refs.qr_png);
+        
+        websocket3.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve3({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+  
+        // resolveされるまで待機
+        await resolved3;
       }
       if(token2Info.issuer != null) {
-        const trust_result2 = await client.submitAndWait({
+        const { 
+          created: create3, 
+          resolve : resolve3, 
+          resolved: resolved3, 
+          websocket: websocket3 
+        } = await xumm!.payload!.createAndSubscribe({
           "TransactionType": "TrustSet",
           "Account": address!,
           "Flags": TrustSetFlags.tfClearNoRipple, 
@@ -823,11 +881,24 @@ export const XummProvider = ({
             "issuer": token2Info.issuer!,
             "value": "100000000000000000000000000" // Large limit, arbitrarily chosen
           }
-        }, {
-          autofill: true, 
-          wallet: wallet
         })
-        console.log("trust_result2:", trust_result2)
+  
+        console.log("TrustSet Payload URL:", create3.next.always);
+        console.log("TrustSet Payload QR:", create3.refs.qr_png);
+        
+        websocket3.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve3({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+  
+        // resolveされるまで待機
+        await resolved3;
       }
       
       // Swap用のトランザクションデータを作成する
