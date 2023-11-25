@@ -42,6 +42,14 @@ export default function Swap() {
         await xumm.swap(token1, token0, "1000", xrpToDrops(5))
     }
 
+    /**
+     * トークンをトレードするメソッド
+     */
+    const tradeToken = async() => {
+        setToken0(token1);
+        setToken1(token0);
+    }
+
     return (
         <div className={styles.tabBody}>
             <InputDropBox
@@ -52,7 +60,10 @@ export default function Swap() {
                 onChange={setAmountOut}
                 setToken={setToken0}
             />
-            <div className={styles.swapIcon} onClick={() => {}}>
+            <div 
+                className={styles.swapIcon} 
+                onClick={tradeToken}
+            >
                 <MdSwapVert />
             </div>
             <InputDropBox
