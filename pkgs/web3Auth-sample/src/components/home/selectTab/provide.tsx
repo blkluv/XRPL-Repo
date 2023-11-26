@@ -1,6 +1,6 @@
 import InputDropBox from "@/components/common/inputBox/InputDropBox";
-import { TokenInfo } from "@/context/XummProvider";
-import { useState } from "react";
+import { TokenInfo, XummContext } from "@/context/XummProvider";
+import { useContext, useState } from "react";
 import { MdAdd } from "react-icons/md";
 import styles from "./SelectTab.module.css";
 
@@ -8,9 +8,9 @@ import styles from "./SelectTab.module.css";
 const testData: TokenInfo[] = [
     {
         id: 0,
-        currency: "XRP",
+        currency: null,
         value: "1000",
-        issuer: ""
+        issuer: null
     },
     {
         id: 1,
@@ -31,6 +31,20 @@ export default function Provide() {
     const [token0, setToken0] = useState<TokenInfo>(testData[0]);
     const [token1, setToken1] = useState<TokenInfo>(testData[1]);
     const [activePool, setActivePool] = useState(true);
+
+    const xumm = useContext(XummContext);
+
+    /**
+     * 流動性を提供するメソッド
+     */
+    const depositAmm = async() => {
+        await xumm.depositAmm(
+            token0, 
+            amountOfToken0, 
+            token1, 
+            amountOfToken1
+        )
+    }
 
     return (
         <div className={styles.tabBody}>
@@ -59,7 +73,10 @@ export default function Provide() {
                 </div>
             )}
             <div className={styles.bottomDiv}>
-                <div className={styles.btn} onClick={()=>{}}>
+                <div 
+                    className={styles.btn} 
+                    onClick={depositAmm}
+                >
                     Provide
                 </div>
             </div>

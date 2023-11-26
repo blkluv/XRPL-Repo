@@ -500,45 +500,196 @@ export const XummProvider = ({
    * AMM Deposit メソッド
    */
   const depositAmm = async(
-    wallet: any,
     token1Info: TokenInfo,
     token1Amount: string,
     token2Info: TokenInfo,
     token2Amount: string,
   ) => {
+    var ammdeposit_result;
+    // Connect to the client   
+    await client.connect();
     try {
       globalContext.setLoading(true);
-      var result;
-      if(token1Info.currency != null && token2Info.currency != null) {
-        result = await client.submitAndWait({
+
+      // get env
+      const { FAUCET_SEED } = await getEnv();
+      // Create a wallet using the seed
+      const wallet = await Wallet.fromSeed(FAUCET_SEED);
+      
+      if(token1Info.issuer != null && token2Info.issuer != null) {
+        // send tokens before AMM Deposit 
+        const { 
+          created, 
+          resolve, 
+          resolved, 
+          websocket 
+        } = await xumm!.payload!.createAndSubscribe({
+          "TransactionType": "Payment",
+          "Account": address,
+          "Destination": wallet.address,      
+          "DestinationTag": 1,
+          "Amount": {
+            "currency": token1Info.currency,        
+            "value": token1Amount,                   
+            "issuer": token1Info.issuer!
+          },
+        });
+
+        console.log("Payment Payload URL:", created.next.always);
+        console.log("Payment Payload QR:", created.refs.qr_png);
+        
+        websocket.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+
+        await resolved;
+
+        // send tokens before AMM Deposit 
+        const { 
+          created: created2, 
+          resolve: resolve2, 
+          resolved: resolved2, 
+          websocket: websocket2 
+        } = await xumm!.payload!.createAndSubscribe({
+          "TransactionType": "Payment",
+          "Account": address,
+          "Destination": wallet.address,      
+          "DestinationTag": 1,
+          "Amount": {
+            "currency": token2Info.currency,        
+            "value": token2Amount,                   
+            "issuer": token2Info.issuer!
+          },
+        });
+
+        console.log("Payment2 Payload URL:", created2.next.always);
+        console.log("Payment2 Payload QR:", created2.refs.qr_png);
+        
+        websocket2.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve2({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+
+        await resolved2;
+
+        // AMM Deposit
+        ammdeposit_result = await client.submitAndWait({
           "TransactionType": "AMMDeposit",
           "Account": wallet.address,
           "Amount": {
-            "currency": token1Info.currency,
+            "currency": token1Info.currency!,
             "issuer": token1Info.issuer!,
             "value": token1Amount
           },
           "Amount2": {
-            "currency": token2Info.currency,
+            "currency": token2Info.currency!,
             "issuer": token2Info.issuer!,
             "value": token2Amount
           },
           "Asset": {
-            "currency": token1Info.currency,
+            "currency": token1Info.currency!,
             "issuer": token1Info.issuer!,
           },
           "Asset2": {
-            "currency": token2Info.currency,
+            "currency": token2Info.currency!,
             "issuer": token2Info.issuer!,
           },
           "Flags" : 1048576,
         }, {
           autofill: true, 
-          wallet: wallet, 
-          failHard: true
+          wallet: wallet
         })
-      } else if(token2Info.currency == null) {
-        result = await client.submitAndWait({
+
+        // get metaData & TransactionResult
+        const metaData: any = ammdeposit_result.result.meta!;
+        const transactionResult = metaData.TransactionResult;
+        // Use fail_hard so you don't waste the tx cost if you mess up
+        if (transactionResult == "tesSUCCESS") {
+          console.log(`AMM Deposit: ${EXPLORER}/transactions/${ammdeposit_result.result.hash}`)
+          console.log(`Deposit AMM Info: ${metaData}`)
+        } else {
+          throw `Error sending transaction: ${JSON.stringify(ammdeposit_result)}`
+        }
+      } else if(token2Info.issuer == null) {
+        // send tokens before AMM Deposit 
+        const { 
+          created, 
+          resolve, 
+          resolved, 
+          websocket 
+        } = await xumm!.payload!.createAndSubscribe({
+          "TransactionType": "Payment",
+          "Account": address,
+          "Destination": wallet.address,      
+          "DestinationTag": 1,
+          "Amount": {
+            "currency": token1Info.currency!,        
+            "value": token1Amount,                   
+            "issuer": token1Info.issuer!
+          },
+        });
+
+        console.log("Payment Payload URL:", created.next.always);
+        console.log("Payment Payload QR:", created.refs.qr_png);
+        
+        websocket.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+
+        await resolved;
+
+        // send tokens before AMM Deposit 
+        const { 
+          created: created2, 
+          resolve: resolve2, 
+          resolved: resolved2, 
+          websocket: websocket2 
+        } = await xumm!.payload!.createAndSubscribe({
+          "TransactionType": "Payment",
+          "Account": address,
+          "Destination": wallet.address,      
+          "DestinationTag": 1,
+          "Amount": xrpToDrops(token2Amount), 
+        });
+
+        console.log("Payment2 Payload URL:", created2.next.always);
+        console.log("Payment2 Payload QR:", created2.refs.qr_png);
+        
+        websocket2.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve2({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+
+        await resolved2;
+      
+        // AMM Deposit
+        ammdeposit_result = await client.submitAndWait({
           "TransactionType": "AMMDeposit",
           "Account": wallet.address,
           "Amount": {
@@ -546,7 +697,7 @@ export const XummProvider = ({
             "issuer": token1Info.issuer!,
             "value": token1Amount
           },
-          "Amount2": token2Amount,
+          "Amount2": xrpToDrops(token2Amount),
           "Asset": {
             "currency": token1Info.currency!,
             "issuer": token1Info.issuer!,
@@ -557,16 +708,91 @@ export const XummProvider = ({
           "Flags" : 1048576,
         }, {
           autofill: true, 
-          wallet: wallet, 
-          failHard: true
+          wallet: wallet
         })
-      } else if(token1Info.currency == null) {
-        result = await client.submitAndWait({
+
+        // get metaData & TransactionResult
+        const metaData: any = ammdeposit_result.result.meta!;
+        const transactionResult = metaData.TransactionResult;
+        // Use fail_hard so you don't waste the tx cost if you mess up
+        if (transactionResult == "tesSUCCESS") {
+          console.log(`AMM Deposit: ${EXPLORER}/transactions/${ammdeposit_result.result.hash}`)
+          console.log(`Deposit AMM Info: ${metaData}`)
+        } else {
+          throw `Error sending transaction: ${JSON.stringify(ammdeposit_result)}`
+        }
+      } else if(token1Info.issuer == null) {
+        // send tokens before AMM Deposit 
+        const { 
+          created, 
+          resolve, 
+          resolved, 
+          websocket 
+        } = await xumm!.payload!.createAndSubscribe({
+          "TransactionType": "Payment",
+          "Account": address,
+          "Destination": wallet.address,      
+          "DestinationTag": 1,
+          "Amount": {
+            "currency": token2Info.currency,        
+            "value": token2Amount,                   
+            "issuer": token2Info.issuer!
+          },
+        });
+
+        console.log("Payment Payload URL:", created.next.always);
+        console.log("Payment Payload QR:", created.refs.qr_png);
+        
+        websocket.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+
+        await resolved;
+
+        // send tokens before AMM Deposit 
+        const { 
+          created: created2, 
+          resolve: resolve2, 
+          resolved: resolved2, 
+          websocket: websocket2 
+        } = await xumm!.payload!.createAndSubscribe({
+          "TransactionType": "Payment",
+          "Account": address,
+          "Destination": wallet.address,      
+          "DestinationTag": 1,
+          "Amount": xrpToDrops(token1Amount), 
+        });
+
+        console.log("Payment2 Payload URL:", created2.next.always);
+        console.log("Payment2 Payload QR:", created2.refs.qr_png);
+        
+        websocket2.onmessage = (msg) => {
+          const data = JSON.parse(msg.data.toString());
+          // トランザクションへの署名が完了/拒否されたらresolve
+          if (typeof data.signed === "boolean") {
+            resolve2({
+              signed: data.signed,
+              txid: data.txid,
+            });
+          }
+        };
+
+        await resolved2;
+
+        // AMM Deposit
+        ammdeposit_result = await client.submitAndWait({
           "TransactionType": "AMMDeposit",
           "Account": wallet.address,
-          "Amount": token1Amount,
+          "Amount": xrpToDrops(token1Amount),
           "Amount2": {
-            "currency": token2Info.currency,
+            "currency": token2Info.currency!,
             "issuer": token2Info.issuer!,
             "value": token2Amount
           },
@@ -574,30 +800,30 @@ export const XummProvider = ({
             "currency": "XRP"
           },
           "Asset2": { 
-            "currency": token1Info.currency!,
-            "issuer": token1Info.issuer!,
+            "currency": token2Info.currency!,
+            "issuer": token2Info.issuer!,
           },
           "Flags" : 1048576,
         }, {
           autofill: true, 
-          wallet: wallet, 
-          failHard: true
+          wallet: wallet
         })
-      }
-  
-      // get metaData & TransactionResult
-      const metaData: any = result!.result.meta!;
-      const transactionResult = metaData.TransactionResult;
-    
-      // Use fail_hard so you don't waste the tx cost if you mess up
-      if (transactionResult == "tesSUCCESS") {
-        console.log(`AMM deposit: ${EXPLORER}/transactions/${result!.result.hash}`)
-      } else {
-        throw `Error sending transaction: ${JSON.stringify(result)}`
+
+        // get metaData & TransactionResult
+        const metaData: any = ammdeposit_result.result.meta!;
+        const transactionResult = metaData.TransactionResult;
+        // Use fail_hard so you don't waste the tx cost if you mess up
+        if (transactionResult == "tesSUCCESS") {
+          console.log(`AMM Deposit: ${EXPLORER}/transactions/${ammdeposit_result.result.hash}`)
+          console.log(`Deposit AMM Info: ${metaData}`)
+        } else {
+          throw `Error sending transaction: ${JSON.stringify(ammdeposit_result)}`
+        }
       }
     } catch(err) {
       console.error("error occuered while depositAmm:", err)
     } finally {
+      await client.disconnect();
       globalContext.setLoading(false);
     }
   }
@@ -614,6 +840,11 @@ export const XummProvider = ({
     try {
       globalContext.setLoading(true);
       if(token1Info.currency != null && token2Info.currency != null) { 
+        // send LP Token to wallet address
+
+        // withdraw AMM
+
+        // send tokens to address from wallet.address
         const { 
           created, 
           resolve, 
@@ -644,8 +875,8 @@ export const XummProvider = ({
             "Flags" : 1048576,
           })
 
-        console.log("Payload URL:", created.next.always);
-        console.log("Payload QR:", created.refs.qr_png);
+        console.log("AMMWithdraw Payload URL:", created.next.always);
+        console.log("AMMWithdraw Payload QR:", created.refs.qr_png);
         
         websocket.onmessage = (msg) => {
           const data = JSON.parse(msg.data.toString());
@@ -657,6 +888,8 @@ export const XummProvider = ({
             });
           }
         };
+
+        await resolved;
       } else if(token2Info.currency == null) {
         const { 
           created, 
@@ -683,8 +916,8 @@ export const XummProvider = ({
           "Flags" : 1048576,
         })
         
-        console.log("Payload URL:", created.next.always);
-        console.log("Payload QR:", created.refs.qr_png);
+        console.log("AMMWithdraw Payload URL:", created.next.always);
+        console.log("AMMWithdraw Payload QR:", created.refs.qr_png);
         
         websocket.onmessage = (msg) => {
           const data = JSON.parse(msg.data.toString());
@@ -696,6 +929,8 @@ export const XummProvider = ({
             });
           }
         };
+
+        await resolved;
       } else if(token1Info.currency == null) {
         const { 
           created, 
@@ -721,8 +956,8 @@ export const XummProvider = ({
           "Flags" : 1048576,
         })
 
-        console.log("Payload URL:", created.next.always);
-        console.log("Payload QR:", created.refs.qr_png);
+        console.log("AMMWithdraw Payload URL:", created.next.always);
+        console.log("AMMWithdraw Payload QR:", created.refs.qr_png);
         
         websocket.onmessage = (msg) => {
           const data = JSON.parse(msg.data.toString());
@@ -734,6 +969,8 @@ export const XummProvider = ({
             });
           }
         };
+
+        await resolved;
       }
     } catch(err) {
       console.error("error occuered while withdrawAmm:", err)
